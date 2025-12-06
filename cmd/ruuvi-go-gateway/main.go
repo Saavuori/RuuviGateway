@@ -15,9 +15,9 @@ func main() {
 	strictConfig := flag.Bool("strict-config", false, "Use strict parsing for the config file; will throw errors for invalid fields")
 	versionFlag := flag.Bool("version", false, "Prints the version and exits")
 	flag.Parse()
+	version.Print()
 
 	if *versionFlag {
-		version.Print()
 		return
 	}
 
@@ -30,5 +30,5 @@ func main() {
 		"configfile": *configPath,
 	}).Debug("Config loaded")
 
-	gateway.Run(conf)
+	gateway.Run(conf, *configPath)
 }

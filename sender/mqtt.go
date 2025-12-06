@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/Scrin/ruuvi-go-gateway/config"
+	"github.com/Scrin/ruuvi-go-gateway/parser"
+	"github.com/Scrin/ruuvi-go-gateway/value_calculator"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/rigado/ble"
 	log "github.com/sirupsen/logrus"
@@ -86,6 +88,30 @@ func SetupMQTT(conf config.MQTT) {
 func SendMQTT(conf config.MQTT, adv ble.Advertisement, gwMac string) {
 	mac := strings.ToUpper(adv.Addr().String())
 	data := adv.ManufacturerData()
+	
+	if conf.SendDecoded {
+		// Reconstruct raw packet for parser
+		// Flags (020106) + Length of ManData (1 byte) + Type (FF) + ManData (ID + Payload)
+		rawInput := fmt.Sprintf("020106%02XFF%X", len(data)+1, data)
+		measurement, ok := parser.Parse(rawInput)
+		if ok {
+			measurement.Mac = mac
+			rssi := int64(adv.RSSI())
+			measurement.Rssi = &rssi
+			
+			value_calculator.CalcExtendedValues(&measurement)
+
+			jsonData, err := json.Marshal(measurement)
+			if err != nil {
+				log.WithError(err).Error("Failed to serialize decoded data")
+			} else {
+				client.Publish(conf.TopicPrefix+"/"+mac, 0, false, string(jsonData))
+			}
+			return
+		}
+		log.Warn("Failed to decode data, sending raw")
+	}
+
 	flags := []byte{0x00} // the actual advertisement flags don't seem to be available, so just use zero
 	message := mqttMessage{
 		GwMac:  gwMac,
@@ -96,10 +122,10 @@ func SendMQTT(conf config.MQTT, adv ble.Advertisement, gwMac string) {
 		Data:   fmt.Sprintf("0201%X%XFF%X", flags, len(data)+1, data),
 		Coords: "",
 	}
-	data, err := json.Marshal(message)
+	jsonData, err := json.Marshal(message)
 	if err != nil {
 		log.WithError(err).Error("Failed to serialize data")
 	} else {
-		client.Publish(conf.TopicPrefix+"/"+mac, 0, false, string(data))
+		client.Publish(conf.TopicPrefix+"/"+mac, 0, false, string(jsonData))
 	}
 }

@@ -43,11 +43,11 @@ func SetupHTTP(conf config.HTTP, gwMac string) {
 	}).Info("Starting HTTP")
 
 	httpClient = http.Client{
-		Timeout: conf.Interval,
+		Timeout: time.Duration(conf.Interval),
 	}
 
 	go func() {
-		ticker := time.NewTicker(conf.Interval)
+		ticker := time.NewTicker(time.Duration(conf.Interval))
 		for {
 			<-ticker.C
 			msg := httpMessage{Data: httpMessageData{

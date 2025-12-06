@@ -1,47 +1,13 @@
 package logging
 
 import (
+	"os"
+
 	"github.com/Scrin/ruuvi-go-gateway/config"
 	log "github.com/sirupsen/logrus"
 )
 
 func Setup(conf config.Logging) {
-	timestamps := true
-	if conf.Timestamps != nil {
-		timestamps = *conf.Timestamps
-	}
-
-	log.SetReportCaller(conf.WithCaller)
-
-	if conf.WithCaller {
-		if timestamps {
-			log.SetFormatter(new(PlainFormatterWithTsWithCaller))
-		} else {
-			log.SetFormatter(new(PlainFormatterWithoutTsWithCaller))
-		}
-	} else {
-		if timestamps {
-			log.SetFormatter(new(PlainFormatterWithTsWithoutCaller))
-		} else {
-			log.SetFormatter(new(PlainFormatterWithoutTsWithoutCaller))
-		}
-	}
-
-	switch conf.Type {
-	case "structured":
-		log.SetFormatter(&log.TextFormatter{
-			DisableTimestamp: !timestamps,
-		})
-	case "json":
-		log.SetFormatter(&log.JSONFormatter{
-			DisableTimestamp: !timestamps,
-		})
-	case "simple":
-	case "":
-	default:
-		log.Fatal("Invalid logging type: ", conf.Type)
-	}
-
 	switch conf.Level {
 	case "trace":
 		log.SetLevel(log.TraceLevel)
@@ -60,6 +26,35 @@ func Setup(conf config.Logging) {
 	case "":
 		log.SetLevel(log.InfoLevel)
 	default:
-		log.Fatal("Invalid logging level: ", conf.Level)
+		log.WithField("configured_level", conf.Level).Fatal("Invalid logging level")
 	}
+
+	switch conf.Type {
+	case "json":
+		log.SetFormatter(&log.JSONFormatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+		})
+	case "structured", "simple", "":
+		log.SetFormatter(&log.TextFormatter{
+			FullTimestamp:   true,
+			TimestampFormat: "2006-01-02 15:04:05",
+		})
+	default:
+		log.WithField("configured_type", conf.Type).Fatal("Invalid logging type")
+	}
+
+	if conf.Timestamps != nil && !*conf.Timestamps {
+		if f, ok := log.StandardLogger().Formatter.(*log.TextFormatter); ok {
+			f.DisableTimestamp = true
+		}
+		if f, ok := log.StandardLogger().Formatter.(*log.JSONFormatter); ok {
+			f.DisableTimestamp = true
+		}
+	}
+
+	if conf.WithCaller {
+		log.SetReportCaller(true)
+	}
+
+	log.SetOutput(os.Stdout)
 }

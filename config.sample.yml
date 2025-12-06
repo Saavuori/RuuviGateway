@@ -7,6 +7,9 @@ all_advertisements: false
 # HCI device index for the bluetooth adapter to use. 0 by default, which should correspond to the hci0 device
 hci_index: 0
 
+# Enable mock scanner (generates fake RuuviTag data) - useful for testing on non-Linux systems
+use_mock: false
+
 # Publish the data to MQTT in Ruuvi Gateway format
 mqtt:
   # Flag to enable or disable publishing the data to a MQTT server
@@ -25,6 +28,8 @@ mqtt:
   lwt_online_payload: '{"state":"online"}'
   # Payload that will be published to lwt_topic when ruuvi-go-gateway disconnects
   lwt_offline_payload: '{"state":"offline"}'
+  # Whether to send decoded JSON (true) or raw Ruuvi Gateway format (false)
+  send_decoded: false
 
 # Publish the data by sending HTTP POSTs in Ruuvi Gateway format
 http:
@@ -47,3 +52,45 @@ logging:
   timestamps: true
   # Whether to include the log caller in the logs. This will increase the size of logs but it helps in troubleshooting in some cases
   with_caller: false
+
+# -----------------------------------------------------------------------------------
+# RuuviBridge Data Sinks (Advanced Processing & Integration)
+# -----------------------------------------------------------------------------------
+
+# Publish processed measurements to MQTT (JSON format)
+mqtt_publisher:
+  enabled: false
+  broker_url: tcp://localhost:1883
+  topic_prefix: ruuvi_measurements
+  client_id: ruuvi-bridge-publisher
+  username: user
+  password: password
+  # Minimum interval between updates for a specific tag to reduce traffic
+  minimum_interval: 1s
+  # Discovery prefix for Home Assistant (empty to disable)
+  homeassistant_discovery_prefix: homeassistant
+
+# Publish processed measurements to InfluxDB v2
+influxdb_publisher:
+  enabled: false
+  url: http://localhost:8086
+  auth_token: my-token
+  org: my-org
+  bucket: ruuvi
+  measurement: ruuvi_measurements
+  minimum_interval: 1s
+
+# Publish processed measurements to InfluxDB v3 (InfluxDB Cloud)
+influxdb3_publisher:
+  enabled: false
+  url: https://us-east-1-1.aws.cloud2.influxdata.com
+  auth_token: my-token
+  database: ruuvi
+  measurement: ruuvi_measurements
+  minimum_interval: 1s
+
+# Expose processed measurements as Prometheus metrics
+prometheus:
+  enabled: false
+  port: 8081
+  measurement_metric_prefix: ruuvi
