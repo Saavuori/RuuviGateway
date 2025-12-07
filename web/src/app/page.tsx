@@ -236,8 +236,8 @@ export default function Home() {
         {/* Discovered Section */}
         <section>
           <div className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-900">Discovered</h2>
-            <p className="text-gray-500 mt-1">Nearby RuuviTags detected by the scanner</p>
+            <h2 className="text-2xl font-semibold text-ruuvi-text">Discovered</h2>
+            <p className="text-ruuvi-text-muted mt-1">Nearby RuuviTags detected by the scanner</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -270,7 +270,7 @@ export default function Home() {
                 />
               ))}
             {tags.length === 0 && (
-              <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
+              <div className="col-span-full py-12 text-center text-ruuvi-text-muted bg-ruuvi-card rounded-xl border border-dashed border-ruuvi-dark">
                 No tags discovered yet.
               </div>
             )}

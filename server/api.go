@@ -29,18 +29,19 @@ type Tag struct {
 	MovementCounter           *int64   `json:"movement_counter,omitempty"`
 	MeasurementSequenceNumber *int64   `json:"measurement_sequence_number,omitempty"`
 	// Extended fields for Format 6 / E1
-	Pm1p0        *float64 `json:"pm1p0,omitempty"`
-	Pm2p5        *float64 `json:"pm2p5,omitempty"`
-	Pm4p0        *float64 `json:"pm4p0,omitempty"`
-	Pm10p0       *float64 `json:"pm10p0,omitempty"`
-	CO2          *float64 `json:"co2,omitempty"`
-	VOC          *float64 `json:"voc,omitempty"`
-	NOX          *float64 `json:"nox,omitempty"`
-	Illuminance  *float64 `json:"illuminance,omitempty"`
-	SoundInstant *float64 `json:"sound_instant,omitempty"`
-	SoundAverage *float64 `json:"sound_average,omitempty"`
-	SoundPeak    *float64 `json:"sound_peak,omitempty"`
-	LastSeen     int64    `json:"last_seen"` // Unix timestamp in ms
+	Pm1p0           *float64 `json:"pm1p0,omitempty"`
+	Pm2p5           *float64 `json:"pm2p5,omitempty"`
+	Pm4p0           *float64 `json:"pm4p0,omitempty"`
+	Pm10p0          *float64 `json:"pm10p0,omitempty"`
+	CO2             *float64 `json:"co2,omitempty"`
+	VOC             *float64 `json:"voc,omitempty"`
+	NOX             *float64 `json:"nox,omitempty"`
+	Illuminance     *float64 `json:"illuminance,omitempty"`
+	SoundInstant    *float64 `json:"sound_instant,omitempty"`
+	SoundAverage    *float64 `json:"sound_average,omitempty"`
+	SoundPeak       *float64 `json:"sound_peak,omitempty"`
+	AirQualityIndex *float64 `json:"air_quality_index,omitempty"`
+	LastSeen        int64    `json:"last_seen"` // Unix timestamp in ms
 }
 
 var (
@@ -56,6 +57,9 @@ func UpdateTag(m parser.Measurement) {
 	tags, ok := recentTags[m.Mac]
 	if !ok {
 		tags = Tag{Mac: m.Mac}
+	}
+	if m.AirQualityIndex != nil {
+		tags.AirQualityIndex = m.AirQualityIndex
 	}
 	if m.Rssi != nil {
 		tags.Rssi = *m.Rssi
