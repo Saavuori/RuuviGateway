@@ -4,6 +4,8 @@
 
 It mimics the Ruuvi Gateway's MQTT and HTTP formats but adds significant new capabilities, including a modern Web UI, direct InfluxDB support, and Prometheus metrics.
 
+![Ruuvi Gateway Web UI](web-ui-screenshot.png)
+
 ### Features
 
 - **Modern Web UI**: View real-time tag data (Temperature, Humidity, Pressure, Voltage, RSSI, Movement).
