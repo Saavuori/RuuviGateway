@@ -40,6 +40,8 @@ mqtt_publisher:
   password: password
   # Minimum interval between updates for a specific tag to reduce traffic
   minimum_interval: 1s
+  # Whether to set the retain flag on published messages (useful for Home Assistant)
+  retain_messages: true
   # Discovery prefix for Home Assistant (empty to disable)
   homeassistant_discovery_prefix: homeassistant
 
