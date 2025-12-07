@@ -20,4 +20,4 @@ services:
     #   - "/dev/bus/usb/002/001:/dev/bus/usb/002/001" 
 
     volumes:
-      - ./config.yml:/config.yml:ro
+      - ./config.yml:/app/config.yml:ro

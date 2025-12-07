@@ -44,6 +44,17 @@ export default function Home() {
       }
     }
     load();
+
+    const interval = setInterval(async () => {
+      try {
+        const t = await fetchTags();
+        setTags(t);
+      } catch (e) {
+        console.error("Failed to refresh tags", e);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleConfigure = (sinkId: string) => {
@@ -243,7 +254,14 @@ export default function Home() {
                   humidity: tag.humidity,
                   pressure: tag.pressure,
                   voltage: tag.battery_voltage,
-                  rssi: tag.rssi
+                  rssi: tag.rssi,
+                  pm2p5: tag.pm2p5,
+                  co2: tag.co2,
+                  voc: tag.voc,
+                  nox: tag.nox,
+                  illuminance: tag.illuminance,
+                  sound_average: tag.sound_average,
+                  movement_counter: tag.movement_counter
                 }}
                 onConfigure={() => openTagModal(tag)}
                 configureLabel="Configure"

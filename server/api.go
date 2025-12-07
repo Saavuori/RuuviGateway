@@ -2,6 +2,7 @@
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
@@ -27,7 +28,19 @@ type Tag struct {
 	TxPower                   *int64   `json:"tx_power,omitempty"`
 	MovementCounter           *int64   `json:"movement_counter,omitempty"`
 	MeasurementSequenceNumber *int64   `json:"measurement_sequence_number,omitempty"`
-	LastSeen                  int64    `json:"last_seen"` // Unix timestamp in ms
+	// Extended fields for Format 6 / E1
+	Pm1p0        *float64 `json:"pm1p0,omitempty"`
+	Pm2p5        *float64 `json:"pm2p5,omitempty"`
+	Pm4p0        *float64 `json:"pm4p0,omitempty"`
+	Pm10p0       *float64 `json:"pm10p0,omitempty"`
+	CO2          *float64 `json:"co2,omitempty"`
+	VOC          *float64 `json:"voc,omitempty"`
+	NOX          *float64 `json:"nox,omitempty"`
+	Illuminance  *float64 `json:"illuminance,omitempty"`
+	SoundInstant *float64 `json:"sound_instant,omitempty"`
+	SoundAverage *float64 `json:"sound_average,omitempty"`
+	SoundPeak    *float64 `json:"sound_peak,omitempty"`
+	LastSeen     int64    `json:"last_seen"` // Unix timestamp in ms
 }
 
 var (
@@ -55,6 +68,20 @@ func UpdateTag(m parser.Measurement) {
 	tags.TxPower = m.TxPower
 	tags.MovementCounter = m.MovementCounter
 	tags.MeasurementSequenceNumber = m.MeasurementSequenceNumber
+
+	// Map extended fields
+	tags.Pm1p0 = m.Pm1p0
+	tags.Pm2p5 = m.Pm2p5
+	tags.Pm4p0 = m.Pm4p0
+	tags.Pm10p0 = m.Pm10p0
+	tags.CO2 = m.CO2
+	tags.VOC = m.VOC
+	tags.NOX = m.NOX
+	tags.Illuminance = m.Illuminance
+	tags.SoundInstant = m.SoundInstant
+	tags.SoundAverage = m.SoundAverage
+	tags.SoundPeak = m.SoundPeak
+
 	tags.LastSeen = time.Now().UnixMilli()
 	recentTags[m.Mac] = tags
 }
@@ -81,9 +108,13 @@ func Start(conf config.Config, confFile string) {
 		mux.Handle("/", http.FileServer(http.FS(fsys)))
 	}
 
-	addr := ":8080" // Default port, TODO configuration
+	port := 8080
+	if conf.HTTPListener != nil && conf.HTTPListener.Port != 0 {
+		port = conf.HTTPListener.Port
+	}
+	addr := fmt.Sprintf(":%d", port)
 	log.WithField("addr", addr).Info("Starting Management Web UI")
-	
+
 	go func() {
 		if err := http.ListenAndServe(addr, mux); err != nil {
 			log.WithError(err).Error("Web UI server failed")
@@ -124,12 +155,12 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to marshal config", http.StatusInternalServerError)
 			return
 		}
-		
+
 		if err := os.WriteFile(configFile, data, 0644); err != nil {
 			http.Error(w, "Failed to write config file", http.StatusInternalServerError)
 			return
 		}
-		
+
 		w.WriteHeader(http.StatusOK)
 		// NOTE: Does not automatically reload the gateway. Restart required.
 	} else {
@@ -140,12 +171,12 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 func handleTags(w http.ResponseWriter, r *http.Request) {
 	tagsLock.RLock()
 	defer tagsLock.RUnlock()
-	
+
 	list := make([]Tag, 0, len(recentTags))
 	for _, t := range recentTags {
 		list = append(list, t)
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(list)
 }
@@ -164,7 +195,7 @@ func handleTagEnable(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	
+
 	req.Mac = strings.ToUpper(req.Mac)
 
 	// Read current config
@@ -254,7 +285,7 @@ func handleTagName(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
-	
+
 	req.Mac = strings.ToUpper(req.Mac)
 
 	// Read current config
@@ -273,7 +304,7 @@ func handleTagName(w http.ResponseWriter, r *http.Request) {
 	if c.TagNames == nil {
 		c.TagNames = make(map[string]string)
 	}
-	
+
 	if req.Name == "" {
 		delete(c.TagNames, req.Mac)
 	} else {

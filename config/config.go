@@ -50,29 +50,6 @@ func (d Duration) MarshalYAML() (interface{}, error) {
 	return time.Duration(d).String(), nil
 }
 
-type MQTT struct {
-	Enabled           *bool   `yaml:"enabled,omitempty" json:"enabled,omitempty"`
-	BrokerUrl         string  `yaml:"broker_url" json:"broker_url"`
-	BrokerAddress     string  `yaml:"broker_address" json:"broker_address"`
-	BrokerPort        int     `yaml:"broker_port" json:"broker_port"`
-	ClientID          string  `yaml:"client_id" json:"client_id"`
-	Username          string  `yaml:"username" json:"username"`
-	Password          string  `yaml:"password" json:"password"`
-	TopicPrefix       string  `yaml:"topic_prefix" json:"topic_prefix"`
-	LWTTopic          *string `yaml:"lwt_topic,omitempty" json:"lwt_topic,omitempty"`
-	LWTOnlinePayload  string  `yaml:"lwt_online_payload" json:"lwt_online_payload"`
-	LWTOfflinePayload string  `yaml:"lwt_offline_payload" json:"lwt_offline_payload"`
-	SendDecoded       bool    `yaml:"send_decoded" json:"send_decoded"`
-}
-
-type HTTP struct {
-	Enabled  *bool    `yaml:"enabled,omitempty" json:"enabled,omitempty"`
-	URL      string   `yaml:"url" json:"url"`
-	Interval Duration `yaml:"interval" json:"interval"`
-	Username string   `yaml:"username" json:"username"`
-	Password string   `yaml:"password" json:"password"`
-}
-
 type Logging struct {
 	Type       string `yaml:"type" json:"type"`
 	Level      string `yaml:"level" json:"level"`
@@ -81,24 +58,23 @@ type Logging struct {
 }
 
 type Config struct {
-	GwMac             string  `yaml:"gw_mac" json:"gw_mac"`
-	AllAdvertisements bool    `yaml:"all_advertisements" json:"all_advertisements"`
-	HciIndex          int     `yaml:"hci_index" json:"hci_index"`
-	UseMock           bool    `yaml:"use_mock" json:"use_mock"`
-	MQTT              *MQTT               `yaml:"mqtt,omitempty" json:"mqtt,omitempty"`
-	HTTP              *HTTP               `yaml:"http,omitempty" json:"http,omitempty"`
-	GatewayPolling    *GatewayPolling     `yaml:"gateway_polling,omitempty" json:"gateway_polling,omitempty"`
-	MQTTListener      *MQTTListener       `yaml:"mqtt_listener,omitempty" json:"mqtt_listener,omitempty"`
-	HTTPListener      *HTTPListener       `yaml:"http_listener,omitempty" json:"http_listener,omitempty"`
-	Processing        *Processing         `yaml:"processing,omitempty" json:"processing,omitempty"`
-	InfluxDBPublisher *InfluxDBPublisher  `yaml:"influxdb_publisher,omitempty" json:"influxdb_publisher,omitempty"`
+	GwMac             string `yaml:"gw_mac" json:"gw_mac"`
+	AllAdvertisements bool   `yaml:"all_advertisements" json:"all_advertisements"`
+	HciIndex          int    `yaml:"hci_index" json:"hci_index"`
+	UseMock           bool   `yaml:"use_mock" json:"use_mock"`
+
+	GatewayPolling     *GatewayPolling     `yaml:"gateway_polling,omitempty" json:"gateway_polling,omitempty"`
+	MQTTListener       *MQTTListener       `yaml:"mqtt_listener,omitempty" json:"mqtt_listener,omitempty"`
+	HTTPListener       *HTTPListener       `yaml:"http_listener,omitempty" json:"http_listener,omitempty"`
+	Processing         *Processing         `yaml:"processing,omitempty" json:"processing,omitempty"`
+	InfluxDBPublisher  *InfluxDBPublisher  `yaml:"influxdb_publisher,omitempty" json:"influxdb_publisher,omitempty"`
 	InfluxDB3Publisher *InfluxDB3Publisher `yaml:"influxdb3_publisher,omitempty" json:"influxdb3_publisher,omitempty"`
-	Prometheus        *Prometheus         `yaml:"prometheus,omitempty" json:"prometheus,omitempty"`
-	MQTTPublisher     *MQTTPublisher      `yaml:"mqtt_publisher,omitempty" json:"mqtt_publisher,omitempty"`
-	TagNames          map[string]string   `yaml:"tag_names,omitempty" json:"tag_names,omitempty"`
-	EnabledTags       []string            `yaml:"enabled_tags,omitempty" json:"enabled_tags,omitempty"`
-	Logging           Logging `yaml:"logging" json:"logging"`
-	Debug             bool    `yaml:"debug" json:"debug"`
+	Prometheus         *Prometheus         `yaml:"prometheus,omitempty" json:"prometheus,omitempty"`
+	MQTTPublisher      *MQTTPublisher      `yaml:"mqtt_publisher,omitempty" json:"mqtt_publisher,omitempty"`
+	TagNames           map[string]string   `yaml:"tag_names,omitempty" json:"tag_names,omitempty"`
+	EnabledTags        []string            `yaml:"enabled_tags,omitempty" json:"enabled_tags,omitempty"`
+	Logging            Logging             `yaml:"logging" json:"logging"`
+	Debug              bool                `yaml:"debug" json:"debug"`
 }
 
 type GatewayPolling struct {
@@ -201,4 +177,3 @@ func ReadConfig(configFile string, strict bool) (Config, error) {
 	}
 	return conf, nil
 }
-

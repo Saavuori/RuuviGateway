@@ -25,3 +25,7 @@ web/yarn-error.log*
 *.swp
 *.swo
 *~
+
+# Local configuration
+config.yml
+verification_config.yml

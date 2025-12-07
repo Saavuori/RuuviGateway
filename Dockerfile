@@ -1,5 +1,5 @@
 # Stage 1: Build the frontend
-FROM node:22-alpine AS frontend-builder
+FROM --platform=$BUILDPLATFORM node:22-alpine AS frontend-builder
 WORKDIR /app/web
 COPY web/package*.json ./
 RUN npm ci
@@ -10,7 +10,7 @@ RUN npm run build
 
 # Stage 2: Build the backend and embed frontend
 FROM golang:1.23-alpine AS backend-builder
-ARG VERSION="unknown-docker"
+ARG VERSION="V0.1.0"
 WORKDIR /app
 
 # Copy Go module files first for better caching

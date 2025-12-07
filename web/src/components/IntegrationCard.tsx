@@ -1,4 +1,4 @@
-import { LucideIcon, Pencil, Thermometer, Droplets, Gauge, Zap, Signal } from 'lucide-react';
+import { LucideIcon, Pencil, Thermometer, Droplets, Gauge, Zap, Signal, Battery, Sun, Activity } from 'lucide-react';
 
 interface IntegrationCardProps {
     title: string;
@@ -15,6 +15,13 @@ interface IntegrationCardProps {
         pressure?: number;
         voltage?: number;
         rssi?: number;
+        pm2p5?: number;
+        co2?: number;
+        voc?: number;
+        nox?: number;
+        illuminance?: number;
+        sound_average?: number;
+        movement_counter?: number;
     };
     subtitle?: string;
 }
@@ -50,8 +57,8 @@ export function IntegrationCard({
                 </div>
                 {status && (
                     <span className={`shrink-0 px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full ${status === 'active' ? 'bg-green-100 text-green-700' :
-                            status === 'new' ? 'bg-blue-100 text-blue-700' :
-                                'bg-gray-100 text-gray-600'
+                        status === 'new' ? 'bg-blue-100 text-blue-700' :
+                            'bg-gray-100 text-gray-600'
                         }`}>
                         {status}
                     </span>
@@ -87,6 +94,72 @@ export function IntegrationCard({
                             {sensors.rssi} dBm
                         </span>
                     </div>
+
+                    {/* Extended Sensors */}
+                    {sensors.pm2p5 !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2 col-span-2 sm:col-span-1">
+                            <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold text-gray-500 border border-gray-400 rounded-sm">PM</span>
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.pm2p5.toFixed(1)} µg/m³
+                            </span>
+                        </div>
+                    )}
+                    {sensors.co2 !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold text-green-600 border border-green-600 rounded-sm">CO2</span>
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.co2.toFixed(0)} ppm
+                            </span>
+                        </div>
+                    )}
+                    {sensors.voc !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold text-orange-500 border border-orange-500 rounded-sm">VOC</span>
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.voc.toFixed(0)}
+                            </span>
+                        </div>
+                    )}
+                    {sensors.nox !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold text-red-500 border border-red-500 rounded-sm">NOX</span>
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.nox.toFixed(0)}
+                            </span>
+                        </div>
+                    )}
+                    {sensors.illuminance !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <Sun className="w-4 h-4 text-yellow-500" />
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.illuminance.toFixed(0)} lx
+                            </span>
+                        </div>
+                    )}
+                    {sensors.voltage !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <Battery className="w-4 h-4 text-green-600" />
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.voltage.toFixed(2)} V
+                            </span>
+                        </div>
+                    )}
+                    {sensors.sound_average !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <span className="w-4 h-4 flex items-center justify-center text-[10px] font-bold text-blue-500">dB</span>
+                            <span className="text-sm font-medium text-gray-700">
+                                {sensors.sound_average.toFixed(1)} dB
+                            </span>
+                        </div>
+                    )}
+                    {sensors.movement_counter !== undefined && (
+                        <div className="bg-gray-50 rounded p-2 flex items-center gap-2">
+                            <Activity className="w-4 h-4 text-purple-600" />
+                            <span className="text-sm font-medium text-gray-700">
+                                #{sensors.movement_counter}
+                            </span>
+                        </div>
+                    )}
                 </div>
             )}
 

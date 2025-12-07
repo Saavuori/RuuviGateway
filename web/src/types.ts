@@ -81,5 +81,17 @@ export interface Tag {
     tx_power?: number;
     movement_counter?: number;
     measurement_sequence_number?: number;
+    // Extended fields (Format E1 / 6)
+    pm1p0?: number;
+    pm2p5?: number;
+    pm4p0?: number;
+    pm10p0?: number;
+    co2?: number;
+    voc?: number;
+    nox?: number;
+    illuminance?: number;
+    sound_instant?: number;
+    sound_average?: number;
+    sound_peak?: number;
     last_seen: number; // Unix timestamp
 }

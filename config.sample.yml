@@ -10,37 +10,10 @@ hci_index: 0
 # Enable mock scanner (generates fake RuuviTag data) - useful for testing on non-Linux systems
 use_mock: false
 
-# Publish the data to MQTT in Ruuvi Gateway format
-mqtt:
-  # Flag to enable or disable publishing the data to a MQTT server
-  enabled: false
-  # MQTT broker url, including scheme (tcp, ssl or ws), hostname or IP address, and port
-  broker_url: tcp://ip.or.hostname:1883
-  client_id: ruuvi-go-gateway
-  username: ruuvigogateway
-  password: ruuvipassword
-  # Topic prefix where to publish, in format <topic_prefix>/<mac>
-  topic_prefix: ruuvi
-  # Topic where to publish LWT "status messages" on connect/disconnect. Empty means disabled.
-  # The default value for this is <topic_prefix>/gw_status which matches the behavior of the physical Ruuvi Gateway
-  #lwt_topic: ""
-  # Payload that will be published to lwt_topic when ruuvi-go-gateway connects
-  lwt_online_payload: '{"state":"online"}'
-  # Payload that will be published to lwt_topic when ruuvi-go-gateway disconnects
-  lwt_offline_payload: '{"state":"offline"}'
-  # Whether to send decoded JSON (true) or raw Ruuvi Gateway format (false)
-  send_decoded: false
-
-# Publish the data by sending HTTP POSTs in Ruuvi Gateway format
-http:
-  # Flag to enable or disable publishing the data to a MQTT server
-  enabled: false
-  # URL including scheme and hostname or ip, and optionally a port and a subpath
-  url: http://ip.or.hostname:8080/record
-  # Interval for sending measurements. Accepts values in go duration format ( https://pkg.go.dev/time#ParseDuration ), for example 1m30s
-  interval: 10s
-  username: ruuvigogateway
-  password: ruuvipassword
+# HTTP Configuration (Management UI)
+http_listener:
+  enabled: true
+  port: 8080
 
 # Logging options for ruuvi-go-gateway itself
 logging:

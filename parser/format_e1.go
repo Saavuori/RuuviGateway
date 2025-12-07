@@ -19,15 +19,15 @@ func ParseFormatE1(input string) (Measurement, error) {
 		return m, errors.New("data is too short")
 	}
 
-	if data[1] != 0xff { // manufacturer specific data
+	if data[4] != 0xff { // manufacturer specific data
 		return m, errors.New("data is not manufacturer specific data")
 	}
 
-	if data[2] != ruuviCompanyIdentifier[0] || data[3] != ruuviCompanyIdentifier[1] {
+	if data[5] != ruuviCompanyIdentifier[0] || data[6] != ruuviCompanyIdentifier[1] {
 		return m, errors.New("data has wrong company identifier")
 	}
 
-	data = data[4:]
+	data = data[7:]
 
 	if data[0] != 0xe1 { // data format
 		return m, errors.New("data is not in data format E1")
