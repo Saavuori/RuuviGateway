@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/bridged-device-basic-information/BridgedDeviceBasicInformationBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,qCAAqC;AAC9C,SAAS,uBAAuB;AAWzB,MAAM,mDAAmD,gBAC3D,cAAsD,EACtD,IAAI,8BAA8B,OAAO;AAGvC,MAAM,wCAA0F;",
+  "names": []
+}

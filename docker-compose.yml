@@ -5,9 +5,8 @@ services:
     image: ruuvi-go-gateway:local
     container_name: ruuvi-go-gateway
     restart: unless-stopped
-    # 'network_mode: host' is required for BLE on Linux to access the HCI interface directly.
-    # This renders 'ports' directive ineffective (app listens on 8080 by default on host IP).
-    network_mode: host
+    ports:
+      - "8080:8080"
 
     # NET_ADMIN capability is often required for BLE scanning operations.
     cap_add:
@@ -20,4 +19,21 @@ services:
     #   - "/dev/bus/usb/002/001:/dev/bus/usb/002/001" 
 
     volumes:
-      - ./config.yml:/app/config.yml:ro
+      - ./config.yml:/app/config.yml
+
+  ruuvi-matter-bridge:
+    build: ./matter-bridge
+    image: ruuvi-matter-bridge:local
+    container_name: ruuvi-matter-bridge
+    restart: unless-stopped
+    ports:
+      - "5540:5540/tcp"
+      - "5540:5540/udp"
+      - "5353:5353/udp"
+    environment:
+      - CONFIG_PATH=/app/config.yml
+      - STORAGE_PATH=/data
+      - GATEWAY_API=http://ruuvigateway:8080/api/tags
+    volumes:
+      - ./config.yml:/app/config.yml
+      - ./matter_data:/data

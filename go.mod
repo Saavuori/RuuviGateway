@@ -1,6 +1,6 @@
 module github.com/Saavuori/ruuvi-go-gateway
 
-go 1.25
+go 1.23.10
 
 require (
 	github.com/InfluxCommunity/influxdb3-go/v2 v2.11.0

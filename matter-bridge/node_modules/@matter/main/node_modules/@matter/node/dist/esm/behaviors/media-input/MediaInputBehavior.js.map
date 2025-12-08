@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/media-input/MediaInputBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,kBAAkB;AAC3B,SAAS,uBAAuB;AAUzB,MAAM,gCAAgC,gBACxC,cAAmC,EACnC,IAAI,WAAW,OAAO;AAGpB,MAAM,qBAAoD;",
+  "names": []
+}

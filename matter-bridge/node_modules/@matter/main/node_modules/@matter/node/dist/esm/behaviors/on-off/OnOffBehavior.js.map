@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/on-off/OnOffBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,aAAa;AACtB,SAAS,uBAAuB;AAUzB,MAAM,2BAA2B,gBACnC,cAA8B,EAC9B,IAAI,MAAM,OAAO;AAGf,MAAM,gBAA0C;",
+  "names": []
+}

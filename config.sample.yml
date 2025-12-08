@@ -70,7 +70,7 @@ prometheus:
   port: 8081
   measurement_metric_prefix: ruuvi
 
-# Matter Bridge Settings
+# Matter Bridge Settings (Used by ruuvi-matter-bridge container)
 matter:
   enabled: false
   # 12-digit setup passcode (must be compliant, e.g. 20202021)

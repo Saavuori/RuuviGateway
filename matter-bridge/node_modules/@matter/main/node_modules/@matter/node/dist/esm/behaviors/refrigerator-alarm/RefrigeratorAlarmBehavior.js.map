@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/refrigerator-alarm/RefrigeratorAlarmBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,yBAAyB;AAClC,SAAS,uBAAuB;AAWzB,MAAM,uCAAuC,gBAC/C,cAA0C,EAC1C,IAAI,kBAAkB,OAAO;AAG3B,MAAM,4BAAkE;",
+  "names": []
+}

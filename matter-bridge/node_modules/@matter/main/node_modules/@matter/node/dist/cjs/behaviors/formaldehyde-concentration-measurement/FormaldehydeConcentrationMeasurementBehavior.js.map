@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/formaldehyde-concentration-measurement/FormaldehydeConcentrationMeasurementBehavior.ts"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,oDAAqD;AACrD,6BAAgC;AAChC,mBAA4B;AAV5B;AAAA;AAAA;AAAA;AAAA;AAoBO,MAAM,0DAA0D,uCAClE,QAAI,0BAAY,mFAAqC,IAAI,CAAC;AAGxD,MAAM,+CAAwG;",
+  "names": []
+}

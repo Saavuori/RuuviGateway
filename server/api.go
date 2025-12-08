@@ -3,6 +3,7 @@
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -341,14 +342,25 @@ func handleTagName(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleMatter(w http.ResponseWriter, r *http.Request, bridge *matter.Bridge) {
-	if bridge == nil {
-		http.Error(w, "Matter support not initialized", http.StatusServiceUnavailable)
-		return
+	// Proxy to external Matter Bridge service
+	bridgeURL := os.Getenv("MATTER_BRIDGE_URL")
+	if bridgeURL == "" {
+		bridgeURL = "http://ruuvi-matter-bridge:5555" // Default Docker service name
 	}
+	// Fallback/Override if running locally without containers might be needed, but ENV is best.
+
+	resp, err := http.Get(bridgeURL + "/api/pairing")
+	if err != nil {
+		// Try localhost as fallback for local dev
+		resp, err = http.Get("http://localhost:5555/api/pairing")
+		if err != nil {
+			log.WithError(err).Error("Failed to contact Matter Bridge")
+			http.Error(w, "Matter Bridge unavailable", http.StatusServiceUnavailable)
+			return
+		}
+	}
+	defer resp.Body.Close()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"pairing_code": bridge.GetPairingCode(),
-		"qr_code":      bridge.GetQRCode(),
-	})
+	io.Copy(w, resp.Body)
 }

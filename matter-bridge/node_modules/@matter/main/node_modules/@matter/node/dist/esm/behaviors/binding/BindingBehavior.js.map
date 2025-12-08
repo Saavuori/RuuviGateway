@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/binding/BindingBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,eAAe;AACxB,SAAS,uBAAuB;AAMzB,MAAM,6BAA6B,gBAAgB,IAAI,QAAQ,OAAO;AAGtE,MAAM,kBAA8C;",
+  "names": []
+}

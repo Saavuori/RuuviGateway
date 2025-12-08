@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/software-diagnostics/SoftwareDiagnosticsBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,2BAA2B;AACpC,SAAS,uBAAuB;AAWzB,MAAM,yCAAyC,gBACjD,cAA4C,EAC5C,IAAI,oBAAoB,OAAO;AAG7B,MAAM,8BAAsE;",
+  "names": []
+}

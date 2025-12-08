@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/door-lock/index.ts"],
+  "mappings": ";;;;;;;;;;;;;;;AAAA;AAAA;AAQA,8BAAc,mCARd;AASA,8BAAc,kCATd;AAUA,8BAAc,gCAVd;AAWA,8BAAc,gCAXd;AAAA;AAAA;AAAA;AAAA;AAAA;",
+  "names": []
+}

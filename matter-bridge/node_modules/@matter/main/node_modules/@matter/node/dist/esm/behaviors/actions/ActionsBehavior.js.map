@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/actions/ActionsBehavior.ts"],
+  "mappings": "AAAA;AAAA;AAAA;AAAA;AAAA;AAQA,SAAS,eAAe;AACxB,SAAS,uBAAuB;AAOzB,MAAM,6BAA6B,gBACrC,cAAgC,EAChC,IAAI,QAAQ,OAAO;AAGjB,MAAM,kBAA8C;",
+  "names": []
+}

@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../src/behaviors/mode-select/index.ts"],
+  "mappings": ";;;;;;;;;;;;;;;AAAA;AAAA;AAQA,gCAAc,qCARd;AASA,gCAAc,oCATd;AAUA,gCAAc,kCAVd;AAWA,gCAAc,kCAXd;AAAA;AAAA;AAAA;AAAA;AAAA;",
+  "names": []
+}
