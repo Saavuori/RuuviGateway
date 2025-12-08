@@ -2,6 +2,8 @@ import { ServerNode, Environment, StorageService } from "@matter/main";
 import { AggregatorEndpoint } from "@matter/main/endpoints/aggregator";
 import { TemperatureSensorDevice } from "@matter/main/devices/temperature-sensor";
 import { BridgedDeviceBasicInformationServer } from "@matter/main/behaviors/bridged-device-basic-information";
+import { RelativeHumidityMeasurementServer } from "@matter/main/behaviors/relative-humidity-measurement";
+import { PressureMeasurementServer } from "@matter/main/behaviors/pressure-measurement";
 import express from "express";
 import axios from "axios";
 import fs from "fs";
@@ -31,8 +33,8 @@ interface Config {
     };
 }
 
-// Define Bridged Device Type
-const BridgedTemperatureSensor = TemperatureSensorDevice.with(BridgedDeviceBasicInformationServer);
+// Define Bridged Device Type with Temperature, Humidity, and Pressure
+const BridgedRuuviTag = TemperatureSensorDevice.with(BridgedDeviceBasicInformationServer, RelativeHumidityMeasurementServer, PressureMeasurementServer);
 
 async function main() {
     console.log("Starting Ruuvi Matter Bridge...");
@@ -78,7 +80,7 @@ async function main() {
         environment,
         // Network Config
         network: {
-            port: 5540,
+            port: 5541,
         },
         // Commissioning Config
         commissioning: {
@@ -160,7 +162,7 @@ async function main() {
                     // Add new endpoint part to the bridge
                     // @ts-ignore
                     device = await bridge.parts.add({
-                        type: BridgedTemperatureSensor,
+                        type: BridgedRuuviTag,
                         id: uniqueId,
                         bridgedDeviceBasicInformation: {
                             nodeLabel: `RuuviTag ${tag.mac}`,
@@ -177,6 +179,13 @@ async function main() {
                     await (device as any).set({
                         temperatureMeasurement: {
                             measuredValue: Math.round(tempVal * 100)
+                        },
+                        relativeHumidityMeasurement: {
+                            measuredValue: tag.humidity !== undefined ? Math.round(tag.humidity * 100) : 0
+                        },
+                        pressureMeasurement: {
+                            // Pressure is in hPa from RuuviTag, Matter expects 10 Pa units (kPa * 10)
+                            measuredValue: tag.pressure !== undefined ? Math.round(tag.pressure * 10) : null
                         }
                     });
                 }
@@ -228,8 +237,8 @@ async function main() {
         });
     });
 
-    app.listen(5555, () => {
-        console.log("Local Bridge API listening on port 5555");
+    app.listen(5555, "0.0.0.0", () => {
+        console.log("Local Bridge API listening on port 5555 (0.0.0.0)");
     });
 }
 
