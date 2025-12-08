@@ -1,6 +1,7 @@
-import { ServerNode } from "@matter/main";
+import { ServerNode, Environment, StorageService } from "@matter/main";
 import { AggregatorEndpoint } from "@matter/main/endpoints/aggregator";
 import { TemperatureSensorDevice } from "@matter/main/devices/temperature-sensor";
+import { BridgedDeviceBasicInformationServer } from "@matter/main/behaviors/bridged-device-basic-information";
 import express from "express";
 import axios from "axios";
 import fs from "fs";
@@ -9,7 +10,7 @@ import path from "path";
 
 // Configuration
 const CONFIG_PATH = process.env.CONFIG_PATH || "/app/config.yml";
-const STORAGE_PATH = process.env.STORAGE_PATH || "/data";
+const STORAGE_PATH = process.env.STORAGE_PATH || "data";
 const GATEWAY_API = process.env.GATEWAY_API || "http://localhost:8080/api/tags";
 
 interface RuuviTag {
@@ -29,6 +30,9 @@ interface Config {
         product_id: number;
     };
 }
+
+// Define Bridged Device Type
+const BridgedTemperatureSensor = TemperatureSensorDevice.with(BridgedDeviceBasicInformationServer);
 
 async function main() {
     console.log("Starting Ruuvi Matter Bridge...");
@@ -61,8 +65,17 @@ async function main() {
         return;
     }
 
+    if (!config.matter.enabled) {
+        console.log("Matter support is disabled in config. Exiting.");
+        return;
+    }
+
+    const environment = Environment.default;
+    environment.get(StorageService).location = path.resolve(STORAGE_PATH);
+
     // Using new API: ServerNode.create(config)
     const server = await ServerNode.create({
+        environment,
         // Network Config
         network: {
             port: 5540,
@@ -147,9 +160,16 @@ async function main() {
                     // Add new endpoint part to the bridge
                     // @ts-ignore
                     device = await bridge.parts.add({
-                        type: TemperatureSensorDevice,
+                        type: BridgedTemperatureSensor,
                         id: uniqueId,
-                    });
+                        bridgedDeviceBasicInformation: {
+                            nodeLabel: `RuuviTag ${tag.mac}`,
+                            serialNumber: tag.mac.replace(/:/g, ""),
+                            productName: "RuuviTag",
+                            reachable: true,
+                            vendorId: config.matter.vendor_id,
+                        }
+                    } as any);
                 } else if (device && tempVal !== undefined) {
                     // Update state
                     // ServerNode Endpoint API
