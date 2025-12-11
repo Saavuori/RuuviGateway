@@ -256,6 +256,9 @@ func handleTagEnable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Update in-memory state for immediate effect (no restart required)
+	UpdateEnabledTags(c.EnabledTags)
+
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":      true,

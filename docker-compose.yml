@@ -1,48 +1,27 @@
-version: "3.5"
 services:
   RuuviGateway:
-    build: .
-    image: ruuvigateway:local
+    image: ghcr.io/saavuori/ruuvigateway:latest
     container_name: RuuviGateway
     restart: unless-stopped
+    privileged: true
+    network_mode: "host"
     ports:
       - "8080:8080"
-
-    # NET_ADMIN capability is often required for BLE scanning operations.
     cap_add:
       - NET_ADMIN
-
-    # Device mapping is typically NOT needed if using network_mode: host and the internal HCI.
-    # If using an external USB dongle and NOT using network_mode: host, you might map it,
-    # but 'github.com/rigado/ble' usually expects host networking for raw socket access.
-    # devices:
-    #   - "/dev/bus/usb/002/001:/dev/bus/usb/002/001" 
-
+      - NET_RAW
     volumes:
       - ./config.yml:/app/config.yml
     environment:
-      # Required for Gateway to fetch status from the local Matter Bridge
       - MATTER_BRIDGE_URL=http://host.docker.internal:5555
-
-  ruuvi-matter-bridge:
-    build: ./matter-bridge
-    image: ruuvi-matter-bridge:local
-    container_name: ruuvi-matter-bridge
+  Matter-Bridge:
+    image: ghcr.io/saavuori/ruuvigateway-matter-bridge:latest
+    container_name: Matter-Bridge
     restart: unless-stopped
-    # network_mode: host is required for mDNS discovery (Matter)
-    # Note: On Windows Docker, this still attaches to the VM network, not the host.
-    # For actual Windows visibility, run this service locally (npm run start).
     network_mode: host
-    # ports: # Ports are not used in host mode
-    #   - "5540:5540/tcp"
-    #   - "5540:5540/udp"
-    #   - "5555:5555/tcp"
-    #   - "5353:5353/udp"
     environment:
       - CONFIG_PATH=/app/config.yml
       - STORAGE_PATH=/data
-      # When using network_mode: host, we cannot resolve the service name 'ruuvigateway'.
-      # Since ruuvigateway exposes port 8080, we can access it via localhost on the host network.
       - GATEWAY_API=http://localhost:8080/api/tags
     volumes:
       - ./config.yml:/app/config.yml

@@ -4,6 +4,9 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
+  /* Custom breakpoint for ultra-wide displays */
+  --breakpoint-3xl: 1920px;
+
   --color-ruuvi-dark: #142928;
   --color-ruuvi-card: #1e3b3a;
   --color-ruuvi-text: #ffffff;

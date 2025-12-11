@@ -91,6 +91,103 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
                 </div>
             </div>
 
+            {/* Air Quality Readings (Data Format 6) */}
+            {tag.data_format === 6 && (
+                <div className="border-t border-ruuvi-dark/50 pt-4">
+                    <h4 className="text-sm font-bold text-white mb-3">Air Quality Readings</h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        {tag.air_quality_index !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-success/30 col-span-2">
+                                <div className="text-ruuvi-success text-xs uppercase tracking-wide font-bold">Air Quality Index</div>
+                                <div className="text-3xl font-bold text-white">
+                                    {tag.air_quality_index.toFixed(0)} <span className="text-lg font-normal text-ruuvi-text-muted">/ 100</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.pm2p5 !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">PM2.5</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.pm2p5.toFixed(1)} <span className="text-sm font-normal text-ruuvi-text-muted">µg/m³</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.co2 !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">CO2</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.co2.toFixed(0)} <span className="text-sm font-normal text-ruuvi-text-muted">ppm</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.pm1p0 !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">PM1.0</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.pm1p0.toFixed(1)} <span className="text-sm font-normal text-ruuvi-text-muted">µg/m³</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.pm4p0 !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">PM4.0</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.pm4p0.toFixed(1)} <span className="text-sm font-normal text-ruuvi-text-muted">µg/m³</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.pm10p0 !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">PM10</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.pm10p0.toFixed(1)} <span className="text-sm font-normal text-ruuvi-text-muted">µg/m³</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.voc !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">VOC Index</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.voc.toFixed(0)}
+                                </div>
+                            </div>
+                        )}
+                        {tag.nox !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">NOX Index</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.nox.toFixed(0)}
+                                </div>
+                            </div>
+                        )}
+                        {tag.illuminance !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Illuminance</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.illuminance.toFixed(0)} <span className="text-sm font-normal text-ruuvi-text-muted">lux</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.sound_average !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Sound (Avg)</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.sound_average.toFixed(1)} <span className="text-sm font-normal text-ruuvi-text-muted">dB</span>
+                                </div>
+                            </div>
+                        )}
+                        {tag.sound_peak !== undefined && (
+                            <div className="p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Sound (Peak)</div>
+                                <div className="text-xl font-bold text-white">
+                                    {tag.sound_peak.toFixed(1)} <span className="text-sm font-normal text-ruuvi-text-muted">dB</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Additional Details */}
             <div className="border-t border-ruuvi-dark/50 pt-4">
                 <h4 className="text-sm font-bold text-white mb-3">Diagnostics</h4>

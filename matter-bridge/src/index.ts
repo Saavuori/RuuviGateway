@@ -221,14 +221,31 @@ async function main() {
         console.log("Device is ALREADY COMMISSIONED");
     }
 
-    server.events.commissioning.commissioned.on(() => {
+    server.events.commissioning.commissioned.on(async () => {
         console.log("EVENT: Device has been COMMISSIONED!");
+        console.log("Fabric credentials persisted to:", path.resolve(STORAGE_PATH));
     });
 
-    server.events.commissioning.decommissioned.on(() => {
+    server.events.commissioning.decommissioned.on(async () => {
         console.log("EVENT: Device has been DECOMMISSIONED");
+        console.log("Fabric credentials updated in:", path.resolve(STORAGE_PATH));
     });
 
+    // Graceful shutdown handler to persist fabric credentials
+    const shutdown = async (signal: string) => {
+        console.log(`\nReceived ${signal}, shutting down gracefully...`);
+        try {
+            await server.close();
+            console.log("Matter server closed, storage flushed.");
+            process.exit(0);
+        } catch (error) {
+            console.error("Error during shutdown:", error);
+            process.exit(1);
+        }
+    };
+
+    process.on("SIGTERM", () => shutdown("SIGTERM"));
+    process.on("SIGINT", () => shutdown("SIGINT"));
 
     app.get("/api/pairing", (req, res) => {
         res.json({

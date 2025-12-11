@@ -22,6 +22,7 @@ export default function Home() {
   const [activeSinkId, setActiveSinkId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<any>(null);
+  const [initialFormData, setInitialFormData] = useState<any>(null);
 
   // Restart Confirmation State
   const [showRestartPrompt, setShowRestartPrompt] = useState(false);
@@ -32,6 +33,8 @@ export default function Home() {
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const [tagModalName, setTagModalName] = useState('');
   const [tagModalEnabled, setTagModalEnabled] = useState(false);
+  const [initialTagName, setInitialTagName] = useState('');
+  const [initialTagEnabled, setInitialTagEnabled] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -113,18 +116,19 @@ export default function Home() {
     setIsSaving(true);
     try {
       if (!selectedTag || !config) return;
-      let changed = false;
+      let nameChanged = false;
       const nameResult = await setTagName(selectedTag.mac, tagModalName);
       if (nameResult.success) {
         setConfig({ ...config, tag_names: nameResult.tag_names });
-        changed = true;
+        nameChanged = tagModalName !== initialTagName;
       }
       const enableResult = await enableTag(selectedTag.mac, tagModalEnabled);
       if (enableResult.success) {
         setConfig(prev => prev ? { ...prev, enabled_tags: enableResult.enabled_tags } : null);
-        changed = true;
+        // Enable/disable takes effect immediately - no restart needed
       }
-      if (changed) setConfigChanged(true);
+      // Only name changes require restart (for data sink topic names etc.)
+      if (nameChanged) setConfigChanged(true);
       setSelectedTag(null);
     } catch (e) {
       alert('Failed to save: ' + e);
@@ -150,26 +154,31 @@ export default function Home() {
   };
 
   const openTagModal = (tag: Tag) => {
+    const name = getTagName(tag.mac) || '';
+    const enabled = isTagEnabled(tag.mac);
     setSelectedTag(tag);
-    setTagModalName(getTagName(tag.mac) || '');
-    setTagModalEnabled(isTagEnabled(tag.mac));
+    setTagModalName(name);
+    setTagModalEnabled(enabled);
+    setInitialTagName(name);
+    setInitialTagEnabled(enabled);
   };
 
   const handleConfigure = (id: string) => {
     setActiveSinkId(id);
     if (!config) return;
 
+    let data: any = null;
     if (id === 'mqtt_publisher') {
-      setFormData(config.mqtt_publisher || {
+      data = config.mqtt_publisher || {
         enabled: false,
         broker_url: 'tcp://localhost:1883',
         client_id: 'ruuvi-gateway',
         topic_prefix: 'ruuvi',
         send_decoded: true,
         minimum_interval: '1s'
-      });
+      };
     } else if (id === 'influxdb_publisher') {
-      setFormData(config.influxdb_publisher || {
+      data = config.influxdb_publisher || {
         enabled: false,
         url: 'http://localhost:8086',
         auth_token: '',
@@ -177,33 +186,43 @@ export default function Home() {
         bucket: 'ruuvi',
         measurement: 'ruuvi_measurements',
         minimum_interval: '1s'
-      });
+      };
     } else if (id === 'influxdb3_publisher') {
-      setFormData(config.influxdb3_publisher || {
+      data = config.influxdb3_publisher || {
         enabled: false,
         url: 'https://us-east-1-1.aws.cloud2.influxdata.com',
         auth_token: '',
         database: 'ruuvi',
         measurement: 'ruuvi_measurements',
         minimum_interval: '1s'
-      });
+      };
     } else if (id === 'matter') {
-      setFormData(config.matter || {
+      data = config.matter || {
         enabled: false,
         passcode: 20202021,
         discriminator: 3840,
         vendor_id: 65521,
         product_id: 32768,
         storage_path: "./matter_data"
-      });
+      };
     } else if (id === 'prometheus') {
       // Prometheus usually just has enabled/disabled in this simple config, 
       // but let's check the schema. It has port and prefix.
       // For now, we don't have a form for it in the modal (based on lines 216-220), 
       // it just shows a message. But we set ID so the modal opens.
     }
+    setFormData(data);
+    setInitialFormData(JSON.parse(JSON.stringify(data))); // Deep clone for comparison
     setIsModalOpen(true);
   };
+
+  // Calculate dirty state for config modal
+  const isConfigFormDirty = formData && initialFormData
+    ? JSON.stringify(formData) !== JSON.stringify(initialFormData)
+    : false;
+
+  // Calculate dirty state for tag modal
+  const isTagFormDirty = tagModalName !== initialTagName || tagModalEnabled !== initialTagEnabled;
 
   const sinks = [
     {
@@ -247,7 +266,7 @@ export default function Home() {
     <div className="min-h-screen bg-ruuvi-dark text-ruuvi-text">
       {/* Header */}
       <header className="bg-ruuvi-card border-b border-ruuvi-dark/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Settings className="w-6 h-6 text-ruuvi-success" />
             <h1 className="text-xl font-bold text-white">Ruuvi Gateway Management</h1>
@@ -266,15 +285,15 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+      <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
         {/* Discovered Section */}
         <section>
-          <div className="mb-6">
+          <div className="mb-6 text-center">
             <h2 className="text-2xl font-semibold text-white">Discovered</h2>
             <p className="text-ruuvi-text-muted mt-1">Nearby RuuviTags detected by the scanner</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex flex-wrap gap-6 justify-center">
             {tags
               .sort((a, b) => a.mac.localeCompare(b.mac))
               .map((tag) => (
@@ -284,7 +303,7 @@ export default function Home() {
                   subtitle={tag.mac}
                   description="" // Not used when sensors are provided
                   icon={Bluetooth}
-                  status={isTagEnabled(tag.mac) ? 'active' : 'new'}
+                  dataFormat={tag.data_format}
                   sensors={{
                     temperature: tag.temperature,
                     humidity: tag.humidity,
@@ -301,8 +320,19 @@ export default function Home() {
                     air_quality_index: tag.air_quality_index
                   }}
                   onConfigure={() => openTagModal(tag)}
-                  configureLabel="Configure"
                   lastSeen={tag.last_seen}
+                  isEnabled={isTagEnabled(tag.mac)}
+                  onToggleEnabled={async (enabled) => {
+                    try {
+                      const result = await enableTag(tag.mac, enabled);
+                      if (result.success) {
+                        setConfig(prev => prev ? { ...prev, enabled_tags: result.enabled_tags } : null);
+                        // No restart required - change takes effect immediately
+                      }
+                    } catch (e) {
+                      console.error('Failed to toggle tag:', e);
+                    }
+                  }}
                 />
               ))}
             {tags.length === 0 && (
@@ -315,12 +345,12 @@ export default function Home() {
 
         {/* Configured Section */}
         <section>
-          <div className="mb-6">
+          <div className="mb-6 text-center">
             <h2 className="text-2xl font-semibold text-white">Configured</h2>
             <p className="text-ruuvi-text-muted mt-1">Active data sinks and integrations</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex flex-wrap gap-6 justify-center">
             {sinks.map((sink) => (
               <IntegrationCard
                 key={sink.id}
@@ -348,6 +378,7 @@ export default function Home() {
         }
         onSubmit={handleSave}
         isSaving={isSaving}
+        isFormDirty={isConfigFormDirty}
       >
         {activeSinkId === 'mqtt_publisher' && (
           <MQTTForm
@@ -415,6 +446,7 @@ export default function Home() {
         title={getTagName(selectedTag?.mac || '') || `RuuviTag ${selectedTag?.mac?.slice(-5) || ''}`}
         onSubmit={saveTagSettings}
         isSaving={isSaving}
+        isFormDirty={isTagFormDirty}
       >
         {selectedTag && (
           <RuuviTagForm

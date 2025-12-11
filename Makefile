@@ -1,18 +1,15 @@
-build:
-	go build -o ruuvi-go-gateway cmd/ruuvi-go-gateway/main.go
+# RuuviGateway - Docker Publish
 
-install: build
-	install -m 755 ruuvi-go-gateway /usr/bin/
-	install -d /etc/ruuvi-go-gateway
+REGISTRY := ghcr.io/saavuori
+TAG := latest
 
-systemd-install:
-	install -m 644 service/ruuvi-go-gateway.service /lib/systemd/system/ruuvi-go-gateway.service
-	systemctl enable ruuvi-go-gateway.service
-	@echo "Please install a configuration file to /etc/ruuvi-go-gateway/config.yml, because"
-	@echo "the systemd service uses it from there. You can start the service manually with:"
-	@echo "    systemctl start ruuvi-go-gateway.service"
+.PHONY: publish push-gateway push-matter
 
-clean:
-	rm -f ruuvi-go-gateway
+push-gateway:
+	docker buildx build --platform linux/arm64 -t $(REGISTRY)/ruuvigateway:$(TAG) --push .
 
-all: build install systemd-install
+push-matter:
+	cd matter-bridge && docker buildx build --platform linux/arm/v7,linux/arm64 -t $(REGISTRY)/ruuvigateway-matter-bridge:$(TAG) --push .
+
+publish: push-gateway push-matter
+	@echo "Done! Pull on Raspberry Pi with: docker compose pull"

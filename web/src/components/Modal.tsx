@@ -8,10 +8,13 @@ interface ModalProps {
     children: ReactNode;
     onSubmit: () => void;
     isSaving?: boolean;
+    isFormDirty?: boolean;
 }
 
-export function Modal({ isOpen, onClose, title, children, onSubmit, isSaving }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children, onSubmit, isSaving, isFormDirty = true }: ModalProps) {
     if (!isOpen) return null;
+
+    const canSave = isFormDirty && !isSaving;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -36,8 +39,11 @@ export function Modal({ isOpen, onClose, title, children, onSubmit, isSaving }: 
                     </button>
                     <button
                         onClick={onSubmit}
-                        disabled={isSaving}
-                        className="px-4 py-2 text-sm font-bold text-ruuvi-dark bg-ruuvi-success rounded-lg hover:bg-ruuvi-success/90 focus:ring-2 focus:ring-ruuvi-success/50 disabled:opacity-50 flex items-center gap-2"
+                        disabled={!canSave}
+                        className={`px-4 py-2 text-sm font-bold rounded-lg focus:ring-2 focus:ring-ruuvi-success/50 flex items-center gap-2 transition-colors ${canSave
+                                ? 'text-ruuvi-dark bg-ruuvi-success hover:bg-ruuvi-success/90'
+                                : 'text-ruuvi-text-muted bg-ruuvi-dark/50 cursor-not-allowed'
+                            }`}
                     >
                         {isSaving ? 'Saving...' : 'Save Configuration'}
                     </button>

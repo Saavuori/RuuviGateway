@@ -25,6 +25,9 @@ func Run(config config.Config, configPath string) {
 	// Start Management Web UI
 	server.Start(config, configPath, matterBridge)
 
+	// Initialize enabled tags state for live updating (no restart required)
+	server.InitEnabledTags(config.EnabledTags)
+
 	gwMac := config.GwMac
 	if gwMac == "" {
 		gwMac = "00:00:00:00:00:00"
@@ -91,16 +94,8 @@ func Run(config config.Config, configPath string) {
 						matterBridge.UpdateTag(measurement)
 					}
 
-					// Send to sinks only if tag is enabled (or if no allowlist is set)
-					tagEnabled := len(config.EnabledTags) == 0 // If no allowlist, send all
-					for _, mac := range config.EnabledTags {
-						if strings.EqualFold(mac, measurement.Mac) {
-							tagEnabled = true
-							break
-						}
-					}
-
-					if tagEnabled {
+					// Send to sinks only if tag is enabled (checked from live state)
+					if server.IsTagEnabled(measurement.Mac) {
 						for _, sink := range sinks {
 							select {
 							case sink <- measurement:
