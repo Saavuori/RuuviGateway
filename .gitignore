@@ -7,4 +7,20 @@
 node_modules/
 dist/
 
+
 matter-bridge/data/
+matter_data/
+*.ps1
+matter-bridge/node_modules/
+matter-bridge/dist/
+
+# Runtime data
+matter_data/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Misc
+web-ui-screenshot.png
+publish.ps1
