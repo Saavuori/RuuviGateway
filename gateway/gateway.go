@@ -1,4 +1,4 @@
-﻿package gateway
+package gateway
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Saavuori/ruuvi-go-gateway/config"
-	"github.com/Saavuori/ruuvi-go-gateway/data_sinks"
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
-	"github.com/Saavuori/ruuvi-go-gateway/server"
-	"github.com/Saavuori/ruuvi-go-gateway/value_calculator"
+	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/data_sinks"
+	"github.com/Saavuori/RuuviGateway/parser"
+	"github.com/Saavuori/RuuviGateway/server"
+	"github.com/Saavuori/RuuviGateway/value_calculator"
 	"github.com/rigado/ble"
 	log "github.com/sirupsen/logrus"
 )

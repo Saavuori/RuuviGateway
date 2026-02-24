@@ -1,4 +1,4 @@
-module github.com/Saavuori/ruuvi-go-gateway
+module github.com/Saavuori/RuuviGateway
 
 go 1.23.10
 

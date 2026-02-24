@@ -1,13 +1,13 @@
-﻿package data_sinks
+package data_sinks
 
 import (
 	"fmt"
 	"net/http"
 	"runtime"
 
-	"github.com/Saavuori/ruuvi-go-gateway/common/version"
-	"github.com/Saavuori/ruuvi-go-gateway/config"
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
+	"github.com/Saavuori/RuuviGateway/common/version"
+	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/parser"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
@@ -69,7 +69,7 @@ func initMetrics(measurementMetricPrefix string) {
 
 	metrics.temperature = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "temperature",
-		Help: "Temperature in ÂºC",
+		Help: "Temperature in ºC",
 	}, tagLabels)
 	metrics.humidity = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "humidity",
@@ -108,19 +108,19 @@ func initMetrics(measurementMetricPrefix string) {
 	// New E1 metrics
 	metrics.pm1p0 = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "pm1p0",
-		Help: "PM1.0 mass concentration (Âµg/mÂ³)",
+		Help: "PM1.0 mass concentration (µg/m³)",
 	}, tagLabels)
 	metrics.pm2p5 = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "pm2p5",
-		Help: "PM2.5 mass concentration (Âµg/mÂ³)",
+		Help: "PM2.5 mass concentration (µg/m³)",
 	}, tagLabels)
 	metrics.pm4p0 = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "pm4p0",
-		Help: "PM4.0 mass concentration (Âµg/mÂ³)",
+		Help: "PM4.0 mass concentration (µg/m³)",
 	}, tagLabels)
 	metrics.pm10p0 = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "pm10p0",
-		Help: "PM10.0 mass concentration (Âµg/mÂ³)",
+		Help: "PM10.0 mass concentration (µg/m³)",
 	}, tagLabels)
 	metrics.co2 = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: measurementMetricPrefix + "co2",

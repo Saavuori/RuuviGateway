@@ -1,4 +1,4 @@
-﻿package data_sinks
+package data_sinks
 
 import (
 	"context"
@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Saavuori/ruuvi-go-gateway/common/limiter"
-	"github.com/Saavuori/ruuvi-go-gateway/config"
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
+	"github.com/Saavuori/RuuviGateway/common/limiter"
+	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/parser"
 	influxdb "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
 	log "github.com/sirupsen/logrus"

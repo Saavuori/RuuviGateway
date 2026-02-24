@@ -1,4 +1,4 @@
-﻿package data_sinks
+package data_sinks
 
 import (
 	"encoding/json"
@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Saavuori/ruuvi-go-gateway/common/limiter"
-	"github.com/Saavuori/ruuvi-go-gateway/config"
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
+	"github.com/Saavuori/RuuviGateway/common/limiter"
+	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/parser"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
 )

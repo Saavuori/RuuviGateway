@@ -1,6 +1,6 @@
-# ruuvi-go-gateway
+# RuuviGateway
 
-**ruuvi-go-gateway** is a lightweight replacement for the physical [Ruuvi Gateway](https://ruuvi.com/gateway/), allowing you to collect data from RuuviTags using a Raspberry Pi or any Linux device with a Bluetooth adapter.
+**RuuviGateway** is a lightweight replacement for the physical [Ruuvi Gateway](https://ruuvi.com/gateway/), allowing you to collect data from RuuviTags using a Raspberry Pi or any Linux device with a Bluetooth adapter.
 
 It mimics the Ruuvi Gateway's MQTT and HTTP formats but adds significant new capabilities, including a modern Web UI, direct InfluxDB support, and Prometheus metrics.
 
@@ -23,7 +23,7 @@ It mimics the Ruuvi Gateway's MQTT and HTTP formats but adds significant new cap
 Run this on your Raspberry Pi:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Saavuori/RuuviGateway/master/install.sh | bash
 ```
 
 This will:
@@ -43,8 +43,8 @@ docker compose up -d
 
 ```bash
 mkdir ruuvigateway && cd ruuvigateway
-curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/docker-compose.yml
-curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/config.sample.yml
+curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/master/docker-compose.yml
+curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/master/config.sample.yml
 cp config.sample.yml config.yml
 nano config.yml
 docker compose up -d
@@ -78,6 +78,6 @@ The configuration supports:
 To build and run from source:
 
 ```bash
-docker build -t ruuvi-go-gateway .
-docker run --net=host -v $(pwd)/config.yml:/app/config.yml:ro ruuvi-go-gateway
+docker build -t ruuvigateway .
+docker run --net=host -v $(pwd)/config.yml:/app/config.yml:ro ruuvigateway
 ```

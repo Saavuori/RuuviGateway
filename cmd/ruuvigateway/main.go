@@ -1,12 +1,12 @@
-﻿package main
+package main
 
 import (
 	"flag"
 
-	"github.com/Saavuori/ruuvi-go-gateway/common/logging"
-	"github.com/Saavuori/ruuvi-go-gateway/common/version"
-	"github.com/Saavuori/ruuvi-go-gateway/config"
-	"github.com/Saavuori/ruuvi-go-gateway/gateway"
+	"github.com/Saavuori/RuuviGateway/common/logging"
+	"github.com/Saavuori/RuuviGateway/common/version"
+	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/gateway"
 	log "github.com/sirupsen/logrus"
 )
 

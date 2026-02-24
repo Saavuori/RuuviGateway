@@ -1,7 +1,7 @@
-﻿package gateway
+package gateway
 
 import (
-	"github.com/Saavuori/ruuvi-go-gateway/config"
+	"github.com/Saavuori/RuuviGateway/config"
 	"github.com/rigado/ble"
 	"github.com/rigado/ble/examples/lib/dev"
 	"github.com/rigado/ble/linux/hci/cmd"

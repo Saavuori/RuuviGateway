@@ -1,9 +1,9 @@
-﻿package value_calculator
+package value_calculator
 
 import (
 	"math"
 
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
+	"github.com/Saavuori/RuuviGateway/parser"
 )
 
 func CalcExtendedValues(m *parser.Measurement) {

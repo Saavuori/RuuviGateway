@@ -15,7 +15,7 @@ http_listener:
   enabled: true
   port: 8080
 
-# Logging options for ruuvi-go-gateway itself
+# Logging options for RuuviGateway itself
 logging:
   # Type can be either "structured", "json" or "simple"
   type: simple

@@ -1,4 +1,4 @@
-﻿package server
+package server
 
 import (
 	"encoding/json"
@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Saavuori/ruuvi-go-gateway/config"
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
-	"github.com/Saavuori/ruuvi-go-gateway/web"
+	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/parser"
+	"github.com/Saavuori/RuuviGateway/web"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 )

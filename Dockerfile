@@ -30,12 +30,12 @@ ARG TARGETARCH
 RUN MODULE=$(go list -m) && \
     GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags "-X ${MODULE}/common/version.Version=${VERSION}" \
-    -o /go/bin/ruuvi-go-gateway ./cmd/ruuvi-go-gateway
+    -o /go/bin/ruuvigateway ./cmd/ruuvigateway
 
 # Stage 3: Final lightweight image
 FROM alpine:latest
 WORKDIR /app
-COPY --from=backend-builder /go/bin/ruuvi-go-gateway .
+COPY --from=backend-builder /go/bin/ruuvigateway .
 # Copy a default config sample if needed, or expect user to mount it
 COPY config.sample.yml ./config.yml
 
@@ -43,4 +43,4 @@ COPY config.sample.yml ./config.yml
 # but usually config is mounted. We'll leave it as just the binary and sample.
 
 EXPOSE 8080
-CMD ["./ruuvi-go-gateway"]
+CMD ["./ruuvigateway"]

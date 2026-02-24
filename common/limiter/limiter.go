@@ -1,9 +1,9 @@
-﻿package limiter
+package limiter
 
 import (
 	"time"
 
-	"github.com/Saavuori/ruuvi-go-gateway/parser"
+	"github.com/Saavuori/RuuviGateway/parser"
 )
 
 type Limiter struct {
