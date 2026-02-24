@@ -18,20 +18,39 @@ It mimics the Ruuvi Gateway's MQTT and HTTP formats but adds significant new cap
 
 ### Installation (Docker - Recommended)
 
-The easiest way to run the gateway is using Docker.
+#### Quick Install (One-liner)
 
-1.  **Clone the repository** (or download `docker-compose.yml` and `config.sample.yml`).
-2.  **Create your configuration**:
-    ```bash
-    cp config.sample.yml config.yml
-    ```
-    Edit `config.yml` to enable your desired sinks (MQTT, InfluxDB, etc.).
-3.  **Start the container**:
-    ```bash
-    docker compose up -d
-    ```
+Run this on your Raspberry Pi:
 
-This uses the pre-built image: `ghcr.io/saavuori/ruuvi-go-gateway`.
+```bash
+curl -fsSL https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/install.sh | bash
+```
+
+This will:
+1. Create a `ruuvigateway/` directory
+2. Download `docker-compose.yml` and a starter `config.yml`
+3. Print next steps including your local Web UI address
+
+Then edit the config and start:
+
+```bash
+cd ruuvigateway
+nano config.yml          # enable your sinks (MQTT, InfluxDB, etc.) and set use_mock: false
+docker compose up -d
+```
+
+#### Manual Install
+
+```bash
+mkdir ruuvigateway && cd ruuvigateway
+curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/docker-compose.yml
+curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/config.sample.yml
+cp config.sample.yml config.yml
+nano config.yml
+docker compose up -d
+```
+
+The pre-built image (`ghcr.io/saavuori/ruuvigateway:latest`) is pulled automatically — no need to build anything.
 
 ### Accessing the Web UI
 
