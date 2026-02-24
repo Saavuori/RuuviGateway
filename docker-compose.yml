@@ -26,6 +26,5 @@ services:
       - WATCHTOWER_SCOPE=ruuvigateway
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_LOG_LEVEL=info
-      - DOCKER_API_VERSION=1.45
     labels:
       - "com.centurylinklabs.watchtower.scope=ruuvigateway"
