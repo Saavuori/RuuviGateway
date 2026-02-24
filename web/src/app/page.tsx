@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchConfig, fetchTags, updateConfig, enableTag, restartGateway, setTagName } from '@/lib/api';
+import { fetchConfig, fetchTags, updateConfig, enableTag, restartGateway, setTagName, fetchVersion } from '@/lib/api';
 import { Config, Tag, MQTTPublisherConfig, InfluxDBPublisherConfig, InfluxDB3PublisherConfig } from '@/types';
 import { IntegrationCard } from '@/components/IntegrationCard';
 import { Modal } from '@/components/Modal';
@@ -14,6 +14,7 @@ import { Bluetooth, Radio, Cloud, Database, BarChart3, Settings, Plus, Check, Re
 export default function Home() {
   const [config, setConfig] = useState<Config | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [version, setVersion] = useState<string>("Unknown");
   const [loading, setLoading] = useState(true);
 
   // Modal State
@@ -38,12 +39,14 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [configData, tagsData] = await Promise.all([
+        const [configData, tagsData, versionData] = await Promise.all([
           fetchConfig(),
-          fetchTags()
+          fetchTags(),
+          fetchVersion()
         ]);
         setConfig(configData);
         setTags(tagsData);
+        setVersion(versionData.version);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       } finally {
@@ -242,7 +245,10 @@ export default function Home() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Settings className="w-6 h-6 text-ruuvi-success" />
-            <h1 className="text-xl font-bold text-white">Ruuvi Gateway Management</h1>
+            <div className="flex flex-col">
+              <h1 className="text-xl font-bold text-white">Ruuvi Gateway Management</h1>
+              <span className="text-xs text-ruuvi-text-muted">{version}</span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             {configChanged && (

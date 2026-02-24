@@ -178,4 +178,9 @@ export async function setTagName(mac: string, name: string): Promise<{ success: 
     return res.json();
 }
 
-
+export async function fetchVersion(): Promise<{ version: string }> {
+    if (IS_DEV) return { version: "v0.1.0-dev" };
+    const res = await fetch('/api/version');
+    if (!res.ok) throw new Error('Failed to fetch version');
+    return res.json();
+}

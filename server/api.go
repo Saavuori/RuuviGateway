@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Saavuori/RuuviGateway/common/version"
 	"github.com/Saavuori/RuuviGateway/config"
 	"github.com/Saavuori/RuuviGateway/parser"
 	"github.com/Saavuori/RuuviGateway/web"
@@ -106,6 +107,7 @@ func Start(conf config.Config, confFile string) {
 	mux.HandleFunc("/api/tags", handleTags)
 	mux.HandleFunc("/api/tags/enable", handleTagEnable)
 	mux.HandleFunc("/api/tags/name", handleTagName)
+	mux.HandleFunc("/api/version", handleVersion)
 	mux.HandleFunc("/api/restart", handleRestart)
 
 	// Static Files (Web UI)
@@ -338,5 +340,17 @@ func handleTagName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success":   true,
 		"tag_names": c.TagNames,
+	})
+}
+
+func handleVersion(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"version": version.Version,
 	})
 }

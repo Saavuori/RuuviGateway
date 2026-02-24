@@ -23,6 +23,7 @@ func main() {
 
 	conf, err := config.ReadConfig(*configPath, *strictConfig)
 	logging.Setup(conf.Logging) // logging should be set up with logging config before logging a possible error in the config, weird, I know
+	log.Infof("Starting RuuviGateway version %s", version.Version)
 	if err != nil {
 		log.WithError(err).Fatal("Failed to load config")
 	}
