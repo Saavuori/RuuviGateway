@@ -27,6 +27,8 @@ All notable changes to this project will be documented in this file.
   - `accelerationTotal` is retained as the single useful acceleration metric
 
 ### Added
+- Auto-tagging mechanism in GitHub Actions upon push to `master`.
+- Surfaced Docker container version to RuuviGateway Web UI and the command line buffer (`/api/version`).
 - `CHANGELOG.md` to track project changes
 - GitHub Actions workflow for automated Docker builds (`.github/`)
 - Retry buffer support for data sinks (`data_sinks/buffer.go`, `data_sinks/buffer_test.go`)
