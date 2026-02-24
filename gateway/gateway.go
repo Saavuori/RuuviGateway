@@ -4,26 +4,20 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/Saavuori/ruuvi-go-gateway/config"
 	"github.com/Saavuori/ruuvi-go-gateway/data_sinks"
 	"github.com/Saavuori/ruuvi-go-gateway/parser"
 	"github.com/Saavuori/ruuvi-go-gateway/server"
-	"github.com/Saavuori/ruuvi-go-gateway/service/matter"
 	"github.com/Saavuori/ruuvi-go-gateway/value_calculator"
 	"github.com/rigado/ble"
 	log "github.com/sirupsen/logrus"
 )
 
 func Run(config config.Config, configPath string) {
-	// Start Matter Bridge
-	matterBridge := matter.New(config.Matter)
-	if err := matterBridge.Start(); err != nil {
-		log.WithError(err).Error("Failed to start Matter bridge")
-	}
-
 	// Start Management Web UI
-	server.Start(config, configPath, matterBridge)
+	server.Start(config, configPath)
 
 	// Initialize enabled tags state for live updating (no restart required)
 	server.InitEnabledTags(config.EnabledTags)
@@ -89,17 +83,13 @@ func Run(config config.Config, configPath string) {
 					// Update Web UI Cache (always, for discovery)
 					server.UpdateTag(measurement)
 
-					// Update Matter Bridge
-					if matterBridge != nil {
-						matterBridge.UpdateTag(measurement)
-					}
-
 					// Send to sinks only if tag is enabled (checked from live state)
 					if server.IsTagEnabled(measurement.Mac) {
 						for _, sink := range sinks {
 							select {
 							case sink <- measurement:
-							default:
+							case <-time.After(100 * time.Millisecond):
+								log.Warn("Sink channel full, measurement dropped")
 							}
 						}
 					}

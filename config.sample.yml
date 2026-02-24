@@ -54,6 +54,10 @@ influxdb_publisher:
   bucket: ruuvi
   measurement: ruuvi_measurements
   minimum_interval: 1s
+  # Retry buffer for when InfluxDB is unavailable (in-memory)
+  # buffer:
+  #   max_size: 500000       # max points to buffer (default: 500000, ~1GB)
+  #   retry_interval: 30s    # how often to retry (default: 30s, max backoff: 5min)
 
 # Publish processed measurements to InfluxDB v3 (InfluxDB Cloud)
 influxdb3_publisher:
@@ -63,6 +67,10 @@ influxdb3_publisher:
   database: ruuvi
   measurement: ruuvi_measurements
   minimum_interval: 1s
+  # Retry buffer (same options as influxdb_publisher)
+  # buffer:
+  #   max_size: 500000
+  #   retry_interval: 30s
 
 # Expose processed measurements as Prometheus metrics
 prometheus:
@@ -70,16 +78,4 @@ prometheus:
   port: 8081
   measurement_metric_prefix: ruuvi
 
-# Matter Bridge Settings (Used by ruuvi-matter-bridge container)
-matter:
-  enabled: false
-  # 12-digit setup passcode (must be compliant, e.g. 20202021)
-  passcode: 20202021
-  # 12-bit discriminator (0-4095)
-  discriminator: 3840
-  # Vendor ID (use Test VID 0xFFF1 for dev)
-  vendor_id: 65521 # 0xFFF1
-  # Product ID (use Test PID 0x8000 for dev)
-  product_id: 32768 # 0x8000
-  # Storage path for persistent matter fabric/keys
-  storage_path: "./matter_data"
+

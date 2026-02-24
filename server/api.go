@@ -3,7 +3,6 @@
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -13,7 +12,6 @@ import (
 
 	"github.com/Saavuori/ruuvi-go-gateway/config"
 	"github.com/Saavuori/ruuvi-go-gateway/parser"
-	"github.com/Saavuori/ruuvi-go-gateway/service/matter"
 	"github.com/Saavuori/ruuvi-go-gateway/web"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -31,19 +29,20 @@ type Tag struct {
 	MovementCounter           *int64   `json:"movement_counter,omitempty"`
 	MeasurementSequenceNumber *int64   `json:"measurement_sequence_number,omitempty"`
 	// Extended fields for Format 6 / E1
-	Pm1p0           *float64 `json:"pm1p0,omitempty"`
-	Pm2p5           *float64 `json:"pm2p5,omitempty"`
-	Pm4p0           *float64 `json:"pm4p0,omitempty"`
-	Pm10p0          *float64 `json:"pm10p0,omitempty"`
-	CO2             *float64 `json:"co2,omitempty"`
-	VOC             *float64 `json:"voc,omitempty"`
-	NOX             *float64 `json:"nox,omitempty"`
-	Illuminance     *float64 `json:"illuminance,omitempty"`
-	SoundInstant    *float64 `json:"sound_instant,omitempty"`
-	SoundAverage    *float64 `json:"sound_average,omitempty"`
-	SoundPeak       *float64 `json:"sound_peak,omitempty"`
-	AirQualityIndex *float64 `json:"air_quality_index,omitempty"`
-	LastSeen        int64    `json:"last_seen"` // Unix timestamp in ms
+	Pm1p0             *float64 `json:"pm1p0,omitempty"`
+	Pm2p5             *float64 `json:"pm2p5,omitempty"`
+	Pm4p0             *float64 `json:"pm4p0,omitempty"`
+	Pm10p0            *float64 `json:"pm10p0,omitempty"`
+	CO2               *float64 `json:"co2,omitempty"`
+	VOC               *float64 `json:"voc,omitempty"`
+	NOX               *float64 `json:"nox,omitempty"`
+	Illuminance       *float64 `json:"illuminance,omitempty"`
+	SoundInstant      *float64 `json:"sound_instant,omitempty"`
+	SoundAverage      *float64 `json:"sound_average,omitempty"`
+	SoundPeak         *float64 `json:"sound_peak,omitempty"`
+	AccelerationTotal *float64 `json:"acceleration_total,omitempty"`
+	AirQualityIndex   *float64 `json:"air_quality_index,omitempty"`
+	LastSeen          int64    `json:"last_seen"` // Unix timestamp in ms
 }
 
 var (
@@ -88,11 +87,14 @@ func UpdateTag(m parser.Measurement) {
 	tags.SoundAverage = m.SoundAverage
 	tags.SoundPeak = m.SoundPeak
 
+	// Calculated fields
+	tags.AccelerationTotal = m.AccelerationTotal
+
 	tags.LastSeen = time.Now().UnixMilli()
 	recentTags[m.Mac] = tags
 }
 
-func Start(conf config.Config, confFile string, matterBridge *matter.Bridge) {
+func Start(conf config.Config, confFile string) {
 	if confFile != "" {
 		configFile = confFile
 	}
@@ -105,11 +107,6 @@ func Start(conf config.Config, confFile string, matterBridge *matter.Bridge) {
 	mux.HandleFunc("/api/tags/enable", handleTagEnable)
 	mux.HandleFunc("/api/tags/name", handleTagName)
 	mux.HandleFunc("/api/restart", handleRestart)
-
-	// Matter API
-	mux.HandleFunc("/api/matter", func(w http.ResponseWriter, r *http.Request) {
-		handleMatter(w, r, matterBridge)
-	})
 
 	// Static Files (Web UI)
 	fsys, err := fs.Sub(web.Assets, "out")
@@ -342,28 +339,4 @@ func handleTagName(w http.ResponseWriter, r *http.Request) {
 		"success":   true,
 		"tag_names": c.TagNames,
 	})
-}
-
-func handleMatter(w http.ResponseWriter, r *http.Request, bridge *matter.Bridge) {
-	// Proxy to external Matter Bridge service
-	bridgeURL := os.Getenv("MATTER_BRIDGE_URL")
-	if bridgeURL == "" {
-		bridgeURL = "http://ruuvi-matter-bridge:5555" // Default Docker service name
-	}
-	// Fallback/Override if running locally without containers might be needed, but ENV is best.
-
-	resp, err := http.Get(bridgeURL + "/api/pairing")
-	if err != nil {
-		// Try localhost as fallback for local dev
-		resp, err = http.Get("http://localhost:5555/api/pairing")
-		if err != nil {
-			log.WithError(err).Error("Failed to contact Matter Bridge")
-			http.Error(w, "Matter Bridge unavailable", http.StatusServiceUnavailable)
-			return
-		}
-	}
-	defer resp.Body.Close()
-
-	w.Header().Set("Content-Type", "application/json")
-	io.Copy(w, resp.Body)
 }

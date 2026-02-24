@@ -71,7 +71,6 @@ type Config struct {
 	InfluxDB3Publisher *InfluxDB3Publisher `yaml:"influxdb3_publisher,omitempty" json:"influxdb3_publisher,omitempty"`
 	Prometheus         *Prometheus         `yaml:"prometheus,omitempty" json:"prometheus,omitempty"`
 	MQTTPublisher      *MQTTPublisher      `yaml:"mqtt_publisher,omitempty" json:"mqtt_publisher,omitempty"`
-	Matter             *Matter             `yaml:"matter,omitempty" json:"matter,omitempty"`
 	TagNames           map[string]string   `yaml:"tag_names,omitempty" json:"tag_names,omitempty"`
 	EnabledTags        []string            `yaml:"enabled_tags,omitempty" json:"enabled_tags,omitempty"`
 	Logging            Logging             `yaml:"logging" json:"logging"`
@@ -112,6 +111,11 @@ type Processing struct {
 	IncludeUnofficial bool     `yaml:"include_unofficial"`
 }
 
+type BufferConfig struct {
+	MaxSize       int      `yaml:"max_size,omitempty" json:"max_size,omitempty"`
+	RetryInterval Duration `yaml:"retry_interval,omitempty" json:"retry_interval,omitempty"`
+}
+
 type InfluxDBPublisher struct {
 	Enabled         *bool             `yaml:"enabled,omitempty" json:"enabled,omitempty"`
 	MinimumInterval Duration          `yaml:"minimum_interval,omitempty" json:"minimum_interval,omitempty"`
@@ -121,6 +125,7 @@ type InfluxDBPublisher struct {
 	Bucket          string            `yaml:"bucket" json:"bucket"`
 	Measurement     string            `yaml:"measurement" json:"measurement"`
 	AdditionalTags  map[string]string `yaml:"additional_tags,omitempty" json:"additional_tags,omitempty"`
+	Buffer          *BufferConfig     `yaml:"buffer,omitempty" json:"buffer,omitempty"`
 }
 
 type InfluxDB3Publisher struct {
@@ -131,6 +136,7 @@ type InfluxDB3Publisher struct {
 	Database        string            `yaml:"database" json:"database"`
 	Measurement     string            `yaml:"measurement" json:"measurement"`
 	AdditionalTags  map[string]string `yaml:"additional_tags,omitempty" json:"additional_tags,omitempty"`
+	Buffer          *BufferConfig     `yaml:"buffer,omitempty" json:"buffer,omitempty"`
 }
 
 type Prometheus struct {
@@ -155,15 +161,6 @@ type MQTTPublisher struct {
 	LWTTopic                     string   `yaml:"lwt_topic" json:"lwt_topic"`
 	LWTOnlinePayload             string   `yaml:"lwt_online_payload" json:"lwt_online_payload"`
 	LWTOfflinePayload            string   `yaml:"lwt_offline_payload" json:"lwt_offline_payload"`
-}
-
-type Matter struct {
-	Enabled       *bool  `yaml:"enabled,omitempty" json:"enabled,omitempty"`
-	Passcode      uint32 `yaml:"passcode" json:"passcode"`
-	Discriminator uint16 `yaml:"discriminator" json:"discriminator"`
-	VendorID      uint16 `yaml:"vendor_id" json:"vendor_id"`
-	ProductID     uint16 `yaml:"product_id" json:"product_id"`
-	StoragePath   string `yaml:"storage_path" json:"storage_path"`
 }
 
 func ReadConfig(configFile string, strict bool) (Config, error) {

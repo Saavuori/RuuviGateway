@@ -18,18 +18,18 @@ func normalizeBrokerURL(url string) string {
 	if url == "" {
 		return "tcp://localhost:1883"
 	}
-	
+
 	// Add tcp:// if no scheme present
 	if !strings.Contains(url, "://") {
 		url = "tcp://" + url
 	}
-	
+
 	// Add :1883 if no port present (check after the scheme)
 	parts := strings.SplitN(url, "://", 2)
 	if len(parts) == 2 && !strings.Contains(parts[1], ":") {
 		url = parts[0] + "://" + parts[1] + ":1883"
 	}
-	
+
 	return url
 }
 
@@ -63,11 +63,11 @@ func MQTT(conf config.MQTTPublisher, tagNames map[string]string) chan<- parser.M
 	}
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-			log.WithFields(log.Fields{
-				"target":           server,
-				"topic_prefix":     conf.TopicPrefix,
-				"minimum_interval": conf.MinimumInterval,
-			}).WithError(token.Error()).Error("Failed to connect to MQTT")
+		log.WithFields(log.Fields{
+			"target":           server,
+			"topic_prefix":     conf.TopicPrefix,
+			"minimum_interval": conf.MinimumInterval,
+		}).WithError(token.Error()).Error("Failed to connect to MQTT")
 	}
 	if conf.LWTTopic != "" {
 		payload := conf.LWTOnlinePayload
@@ -126,22 +126,12 @@ func MQTT(conf config.MQTTPublisher, tagNames map[string]string) chan<- parser.M
 					safePublishF("temperature", measurement.Temperature)
 					safePublishF("humidity", measurement.Humidity)
 					safePublishF("pressure", measurement.Pressure)
-					safePublishF("accelerationX", measurement.AccelerationX)
-					safePublishF("accelerationY", measurement.AccelerationY)
-					safePublishF("accelerationZ", measurement.AccelerationZ)
 					safePublishF("batteryVoltage", measurement.BatteryVoltage)
 					safePublishI("txPower", measurement.TxPower)
 					safePublishI("rssi", measurement.Rssi)
 					safePublishI("movementCounter", measurement.MovementCounter)
 					safePublishI("measurementSequenceNumber", measurement.MeasurementSequenceNumber)
 					safePublishF("accelerationTotal", measurement.AccelerationTotal)
-					safePublishF("absoluteHumidity", measurement.AbsoluteHumidity)
-					safePublishF("dewPoint", measurement.DewPoint)
-					safePublishF("equilibriumVaporPressure", measurement.EquilibriumVaporPressure)
-					safePublishF("airDensity", measurement.AirDensity)
-					safePublishF("accelerationAngleFromX", measurement.AccelerationAngleFromX)
-					safePublishF("accelerationAngleFromY", measurement.AccelerationAngleFromY)
-					safePublishF("accelerationAngleFromZ", measurement.AccelerationAngleFromZ)
 					// New E1 fields
 					safePublishF("pm1p0", measurement.Pm1p0)
 					safePublishF("pm2p5", measurement.Pm2p5)

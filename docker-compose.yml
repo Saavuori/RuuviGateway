@@ -12,17 +12,20 @@ services:
       - NET_RAW
     volumes:
       - ./config.yml:/app/config.yml
-    environment:
-      - MATTER_BRIDGE_URL=http://host.docker.internal:5555
-  Matter-Bridge:
-    image: ghcr.io/saavuori/ruuvigateway-matter-bridge:latest
-    container_name: Matter-Bridge
+    labels:
+      - "com.centurylinklabs.watchtower.scope=ruuvigateway"
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
     restart: unless-stopped
-    network_mode: host
-    environment:
-      - CONFIG_PATH=/app/config.yml
-      - STORAGE_PATH=/data
-      - GATEWAY_API=http://localhost:8080/api/tags
     volumes:
-      - ./config.yml:/app/config.yml
-      - ./matter_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_POLL_INTERVAL=300
+      - WATCHTOWER_SCOPE=ruuvigateway
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LOG_LEVEL=info
+      - DOCKER_API_VERSION=1.45
+    labels:
+      - "com.centurylinklabs.watchtower.scope=ruuvigateway"
