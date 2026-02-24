@@ -46,7 +46,6 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          # Keeping arm64 as per preference in similar projects (e.g. E-Display)
           platforms: linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
