@@ -247,7 +247,7 @@ export default function Home() {
             <Settings className="w-6 h-6 text-ruuvi-success" />
             <div className="flex flex-col">
               <h1 className="text-xl font-bold text-white">Ruuvi Gateway Management</h1>
-              <span className="text-xs text-ruuvi-text-muted">{version}</span>
+              <span className="text-xs text-ruuvi-text-muted">{version} (Watchtower Test)</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
