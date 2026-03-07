@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/Saavuori/RuuviGateway/config"
-	"github.com/Saavuori/RuuviGateway/data_sinks"
 	"github.com/Saavuori/RuuviGateway/parser"
 	"github.com/Saavuori/RuuviGateway/server"
 	"github.com/Saavuori/RuuviGateway/value_calculator"
