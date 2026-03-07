@@ -64,38 +64,32 @@ export function IntegrationCard({
     }
 
     return (
-        <div className="bg-ruuvi-card rounded-xl shadow-lg border border-transparent p-4 flex flex-col h-auto hover:shadow-xl transition-shadow relative overflow-hidden w-72">
-            {/* Header: full-width name row */}
-            <div className="flex items-center gap-2 mb-1 z-10 relative">
-                <div className="p-2 bg-ruuvi-dark/50 rounded-full shrink-0">
+        <div className="bg-ruuvi-card rounded-xl shadow-lg border border-ruuvi-border p-4 flex flex-col h-auto hover:shadow-xl transition-shadow relative overflow-hidden w-72 transition-colors duration-250">
+            {/* Header: Bluetooth icon + (Name / MAC stack) */}
+            <div className="flex items-start gap-3 mb-3 z-10 relative">
+                <div className="p-2 bg-ruuvi-input-bg rounded-full shrink-0 mt-0.5">
                     <Icon className="w-5 h-5 text-ruuvi-success" />
                 </div>
-                <h3 className="font-bold text-base text-ruuvi-text leading-tight truncate flex-1 min-w-0">{title}</h3>
-                {/* Pencil edit icon — stays close to name */}
-                {isRuuviTag && onConfigure && (
-                    <button
-                        onClick={onConfigure}
-                        className="p-1 text-ruuvi-text-muted hover:text-white hover:bg-ruuvi-dark/50 rounded transition-colors shrink-0"
-                        title="Edit tag settings"
-                    >
-                        <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                )}
-            </div>
-
-            {/* Sub-row: MAC / subtitle + last-seen */}
-            <div className="flex items-center gap-2 mb-3 z-10 relative pl-9">
-                {(subtitle || description) && (
-                    <p className="text-[11px] text-ruuvi-text-muted font-mono truncate flex-1 min-w-0">{subtitle || description}</p>
-                )}
-                {displayTime && (
-                    <div className="flex items-center gap-1 shrink-0">
-                        <span className={`w-1.5 h-1.5 rounded-full ${!isStale ? 'bg-ruuvi-success animate-pulse' : 'bg-ruuvi-text-muted'}`} />
-                        <span className="text-[10px] text-ruuvi-text-muted font-medium uppercase tracking-wide whitespace-nowrap">
-                            {displayTime}
-                        </span>
+                <div className="flex-1 min-w-0 pt-0.5">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                        <h3 className="font-bold text-base text-ruuvi-text leading-tight truncate flex-1">{title}</h3>
+                        {/* Pencil edit icon — stays close to name */}
+                        {isRuuviTag && onConfigure && (
+                            <button
+                                onClick={onConfigure}
+                                className="p-1 text-ruuvi-text-muted hover:text-ruuvi-text hover:bg-ruuvi-input-bg rounded transition-colors shrink-0"
+                                title="Edit tag settings"
+                            >
+                                <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                        )}
                     </div>
-                )}
+                    <div className="flex items-center gap-2">
+                        {(subtitle || description) && (
+                            <p className="text-[11px] text-ruuvi-text-muted font-mono truncate flex-1 min-w-0">{subtitle || description}</p>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Status badge for sinks (shown inline near header) */}
@@ -119,7 +113,7 @@ export function IntegrationCard({
                         <div className="grid grid-cols-2 gap-2">
                             {/* Air Quality - double wide */}
                             {aqi !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-3 flex flex-col col-span-2">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col col-span-2 border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-xs font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">AQI</span>
@@ -132,48 +126,48 @@ export function IntegrationCard({
                                             />
                                         </div>
                                     </div>
-                                    <span className="text-lg font-bold text-white">
+                                    <span className="text-lg font-bold text-ruuvi-text">
                                         {aqi.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">/ 100</span>
                                     </span>
                                 </div>
                             )}
                             {sensors.pm2p5 !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-3 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="text-xs font-bold text-ruuvi-text-muted border border-ruuvi-text-muted px-1 rounded-sm">PM</span>
                                         <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">PM2.5</span>
                                     </div>
-                                    <span className="text-lg font-bold text-white">
+                                    <span className="text-lg font-bold text-ruuvi-text">
                                         {sensors.pm2p5.toFixed(1)} <span className="text-xs font-normal text-ruuvi-text-muted">µg/m³</span>
                                     </span>
                                 </div>
                             )}
                             {sensors.co2 !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-3 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="text-xs font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">CO2</span>
                                         <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">CO2</span>
                                     </div>
-                                    <span className="text-lg font-bold text-white">
+                                    <span className="text-lg font-bold text-ruuvi-text">
                                         {sensors.co2.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">ppm</span>
                                     </span>
                                 </div>
                             )}
-                            <div className="bg-ruuvi-dark/30 rounded-lg p-3 flex flex-col">
+                            <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Thermometer className="w-4 h-4 text-ruuvi-text-muted" />
                                     <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">Temp</span>
                                 </div>
-                                <span className="text-lg font-bold text-white">
+                                <span className="text-lg font-bold text-ruuvi-text">
                                     {sensors.temperature?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">°C</span>
                                 </span>
                             </div>
-                            <div className="bg-ruuvi-dark/30 rounded-lg p-3 flex flex-col">
+                            <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                 <div className="flex items-center gap-2 mb-1">
                                     <Droplets className="w-4 h-4 text-ruuvi-text-muted" />
                                     <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">Humidity</span>
                                 </div>
-                                <span className="text-lg font-bold text-white">
+                                <span className="text-lg font-bold text-ruuvi-text">
                                     {sensors.humidity?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">%</span>
                                 </span>
                             </div>
@@ -181,130 +175,130 @@ export function IntegrationCard({
                     ) : (
                         /* Standard sensors for other data formats */
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                            <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                 <div className="flex items-center gap-1.5 mb-0.5">
                                     <Thermometer className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                     <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Temp</span>
                                 </div>
-                                <span className="text-lg font-bold text-white">
+                                <span className="text-lg font-bold text-ruuvi-text">
                                     {sensors.temperature?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">°C</span>
                                 </span>
                             </div>
-                            <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                            <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                 <div className="flex items-center gap-1.5 mb-0.5">
                                     <Droplets className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                     <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Humidity</span>
                                 </div>
-                                <span className="text-lg font-bold text-white">
+                                <span className="text-lg font-bold text-ruuvi-text">
                                     {sensors.humidity?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">%</span>
                                 </span>
                             </div>
                             {sensors.pressure && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1 border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <Gauge className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Pressure</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {(sensors.pressure / 100).toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">hPa</span>
                                     </span>
                                 </div>
                             )}
-                            <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1">
+                            <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1 border border-ruuvi-border transition-colors duration-250">
                                 <div className="flex items-center gap-1.5 mb-0.5">
                                     <Signal className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                     <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">RSSI</span>
                                 </div>
-                                <span className="text-base font-bold text-white">
+                                <span className="text-base font-bold text-ruuvi-text">
                                     {sensors.rssi} <span className="text-xs font-normal text-ruuvi-text-muted">dBm</span>
                                 </span>
                             </div>
 
                             {/* Extended Sensors */}
                             {sensors.pm2p5 !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1 border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <span className="text-[10px] font-bold text-ruuvi-text-muted border border-ruuvi-text-muted px-1 rounded-sm">PM</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">PM2.5</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.pm2p5.toFixed(1)} <span className="text-xs font-normal text-ruuvi-text-muted">µg/m³</span>
                                     </span>
                                 </div>
                             )}
                             {sensors.co2 !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <span className="text-[10px] font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">CO2</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">CO2</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.co2.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">ppm</span>
                                     </span>
                                 </div>
                             )}
                             {sensors.voc !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <span className="text-[10px] font-bold text-orange-400 border border-orange-400 px-1 rounded-sm">VOC</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Index</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.voc.toFixed(0)}
                                     </span>
                                 </div>
                             )}
                             {sensors.nox !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <span className="text-[10px] font-bold text-red-400 border border-red-400 px-1 rounded-sm">NOX</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Index</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.nox.toFixed(0)}
                                     </span>
                                 </div>
                             )}
                             {sensors.illuminance !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <Sun className="w-3.5 h-3.5 text-ruuvi-accent" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Light</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.illuminance.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">lx</span>
                                     </span>
                                 </div>
                             )}
                             {sensors.voltage !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <Battery className="w-3.5 h-3.5 text-ruuvi-success" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Battery</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.voltage.toFixed(2)} <span className="text-xs font-normal text-ruuvi-text-muted">V</span>
                                     </span>
                                 </div>
                             )}
                             {sensors.movement_counter !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <Activity className="w-3.5 h-3.5 text-purple-400" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Moves</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         #{sensors.movement_counter}
                                     </span>
                                 </div>
                             )}
                             {sensors.sound_average !== undefined && (
-                                <div className="bg-ruuvi-dark/30 rounded-lg p-2 flex flex-col">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
                                         <span className="text-[10px] font-bold text-blue-400">dB</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Sound</span>
                                     </div>
-                                    <span className="text-base font-bold text-white">
+                                    <span className="text-base font-bold text-ruuvi-text">
                                         {sensors.sound_average.toFixed(1)} <span className="text-xs font-normal text-ruuvi-text-muted">dB</span>
                                     </span>
                                 </div>
@@ -320,24 +314,41 @@ export function IntegrationCard({
             )}
 
             {/* Actions */}
-            <div className="flex justify-between items-center gap-2 mt-auto pt-2 border-t border-ruuvi-dark/50 z-10 relative">
+            <div className="flex justify-between items-center gap-2 mt-auto pt-2 border-t border-ruuvi-border z-10 relative">
                 {/* Toggle for RuuviTags in footer */}
                 {isRuuviTag && onToggleEnabled ? (
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-ruuvi-text-muted">{isEnabled ? 'Enabled' : 'Disabled'}</span>
-                        <button
-                            onClick={() => onToggleEnabled(!isEnabled)}
-                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ruuvi-success focus:ring-offset-2 focus:ring-offset-ruuvi-card ${isEnabled ? 'bg-ruuvi-success' : 'bg-gray-600'
-                                }`}
-                            role="switch"
-                            aria-checked={isEnabled}
-                            title={isEnabled ? 'Disable tag' : 'Enable tag'}
-                        >
-                            <span
-                                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out ${isEnabled ? 'translate-x-4.5' : 'translate-x-0.5'
-                                    }`}
-                            />
-                        </button>
+                    <div className="grid grid-cols-2 gap-2 flex-1">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-ruuvi-text-muted leading-none mb-1">Status</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-ruuvi-text leading-none">{isEnabled ? 'Enabled' : 'Disabled'}</span>
+                                <button
+                                    onClick={() => onToggleEnabled(!isEnabled)}
+                                    className={`relative inline-flex h-4.5 w-8 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ruuvi-success focus:ring-offset-2 focus:ring-offset-ruuvi-card ${isEnabled ? 'bg-ruuvi-success' : 'bg-gray-600'
+                                        }`}
+                                    role="switch"
+                                    aria-checked={isEnabled}
+                                    title={isEnabled ? 'Disable tag' : 'Enable tag'}
+                                >
+                                    <span
+                                        className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-sm transition-transform duration-200 ease-in-out ${isEnabled ? 'translate-x-4' : 'translate-x-1'
+                                            }`}
+                                    />
+                                </button>
+                            </div>
+                        </div>
+
+                        {displayTime && (
+                            <div className="flex flex-col border-l border-ruuvi-border pl-3">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-ruuvi-text-muted leading-none mb-1">Last Seen</span>
+                                <div className="flex items-center gap-1.5">
+                                    <span className={`w-1.5 h-1.5 rounded-full ${!isStale ? 'bg-ruuvi-success animate-pulse' : 'bg-ruuvi-text-muted'}`} />
+                                    <span className="text-[10px] text-ruuvi-text font-medium uppercase tracking-wide whitespace-nowrap">
+                                        {displayTime}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : <span />}
                 {onEdit && (
