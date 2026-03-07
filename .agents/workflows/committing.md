@@ -4,20 +4,14 @@ description: how to commit and push code changes to GitHub
 
 # Committing and Pushing Code
 
-## Use MCP GitHub Tools — NOT local git
+## Git Identity
 
-This machine does NOT have git user identity configured. Local `git commit` will fail with:
+Set git identity before committing if not already configured:
 
+```powershell
+git config user.name "Sampsa Saavuori"
+git config user.email "sampsa.saavuori@gmail.com"
 ```
-fatal: unable to auto-detect email address
-```
-
-**Always use the GitHub MCP tools instead:**
-
-- `push_files` — push one or more files in a single commit
-- `create_or_update_file` — push a single file
-- `create_branch` — create a new branch
-- `create_pull_request` — open a PR
 
 ## PowerShell Syntax
 

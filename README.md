@@ -23,7 +23,7 @@ It provides a modern Web UI, direct InfluxDB support, MQTT publishing with Home 
 Run this on your Raspberry Pi:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Saavuori/RuuviGateway/master/install.sh | bash
 ```
 
 This will:
@@ -43,8 +43,8 @@ docker compose up -d
 
 ```bash
 mkdir ruuvigateway && cd ruuvigateway
-curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/docker-compose.yml
-curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/main/config.sample.yml
+curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/master/docker-compose.yml
+curl -O https://raw.githubusercontent.com/Saavuori/RuuviGateway/master/config.sample.yml
 cp config.sample.yml config.yml
 nano config.yml
 docker compose up -d
