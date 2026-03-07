@@ -18,6 +18,12 @@ It provides a modern Web UI, direct InfluxDB support, MQTT publishing with Home 
 
 ### Installation (Docker - Recommended)
 
+Ensure your system has the necessary Bluetooth packages installed. On Debian/Ubuntu/Raspberry Pi OS, run:
+
+```bash
+sudo apt-get install bluez bluez-tools pi-bluetooth
+```
+
 #### Quick Install (One-liner)
 
 Run this on your Raspberry Pi:
