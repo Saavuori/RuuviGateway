@@ -113,63 +113,78 @@ export function IntegrationCard({
                         <div className="grid grid-cols-2 gap-2">
                             {/* Air Quality - double wide */}
                             {aqi !== undefined && (
-                                <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col col-span-2 border border-ruuvi-border transition-colors duration-250">
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col col-span-2 border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-xs font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">AQI</span>
-                                            <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">Air Quality</span>
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <span className="text-[10px] font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm leading-none">AQI</span>
+                                            <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider leading-none">Air Quality</span>
                                         </div>
-                                        <div className="h-1.5 w-16 bg-gray-700 rounded-full overflow-hidden">
+                                        <div className="h-1.5 w-16 bg-ruuvi-toggle-bg rounded-full overflow-hidden">
                                             <div
-                                                className={`h-full ${aqi > 80 ? 'bg-ruuvi-success' : aqi > 50 ? 'bg-ruuvi-accent' : 'bg-red-400'}`}
+                                                className={`h-full ${aqi > 80 ? 'bg-ruuvi-success' : aqi > 50 ? 'bg-ruuvi-accent' : 'bg-red-500'}`}
                                                 style={{ width: `${Math.min(100, aqi)}%` }}
                                             />
                                         </div>
                                     </div>
-                                    <span className="text-lg font-bold text-ruuvi-text">
-                                        {aqi.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">/ 100</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {aqi.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] font-medium text-ruuvi-text-muted">/ 100</span>
+                                    </div>
                                 </div>
                             )}
                             {sensors.pm2p5 !== undefined && (
-                                <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-bold text-ruuvi-text-muted border border-ruuvi-text-muted px-1 rounded-sm">PM</span>
-                                        <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">PM2.5</span>
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                        <span className="text-[10px] font-bold text-ruuvi-text-muted border border-ruuvi-text-muted px-1 rounded-sm">PM</span>
+                                        <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">PM2.5</span>
                                     </div>
-                                    <span className="text-lg font-bold text-ruuvi-text">
-                                        {sensors.pm2p5.toFixed(1)} <span className="text-xs font-normal text-ruuvi-text-muted">µg/m³</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.pm2p5.toFixed(1)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">µg/m³</span>
+                                    </div>
                                 </div>
                             )}
                             {sensors.co2 !== undefined && (
-                                <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">CO2</span>
-                                        <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">CO2</span>
+                                <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                        <span className="text-[10px] font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">CO2</span>
+                                        <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">CO2</span>
                                     </div>
-                                    <span className="text-lg font-bold text-ruuvi-text">
-                                        {sensors.co2.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">ppm</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.co2.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">ppm</span>
+                                    </div>
                                 </div>
                             )}
-                            <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Thermometer className="w-4 h-4 text-ruuvi-text-muted" />
-                                    <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">Temp</span>
+                            <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                    <Thermometer className="w-3.5 h-3.5 text-ruuvi-text-muted" />
+                                    <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Temp</span>
                                 </div>
-                                <span className="text-lg font-bold text-ruuvi-text">
-                                    {sensors.temperature?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">°C</span>
-                                </span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-base font-bold text-ruuvi-text">
+                                        {sensors.temperature?.toFixed(1) ?? '--'}
+                                    </span>
+                                    <span className="text-[10px] text-ruuvi-text-muted font-normal">°C</span>
+                                </div>
                             </div>
-                            <div className="bg-ruuvi-input-bg rounded-lg p-3 flex flex-col border border-ruuvi-border transition-colors duration-250">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Droplets className="w-4 h-4 text-ruuvi-text-muted" />
-                                    <span className="text-xs text-ruuvi-text-muted uppercase tracking-wider">Humidity</span>
+                            <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                    <Droplets className="w-3.5 h-3.5 text-ruuvi-text-muted" />
+                                    <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Humidity</span>
                                 </div>
-                                <span className="text-lg font-bold text-ruuvi-text">
-                                    {sensors.humidity?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">%</span>
-                                </span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-base font-bold text-ruuvi-text">
+                                        {sensors.humidity?.toFixed(1) ?? '--'}
+                                    </span>
+                                    <span className="text-[10px] text-ruuvi-text-muted font-normal">%</span>
+                                </div>
                             </div>
                         </div>
                     ) : (
@@ -180,7 +195,7 @@ export function IntegrationCard({
                                     <Thermometer className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                     <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Temp</span>
                                 </div>
-                                <span className="text-lg font-bold text-ruuvi-text">
+                                <span className="text-base font-bold text-ruuvi-text">
                                     {sensors.temperature?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">°C</span>
                                 </span>
                             </div>
@@ -189,7 +204,7 @@ export function IntegrationCard({
                                     <Droplets className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                     <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Humidity</span>
                                 </div>
-                                <span className="text-lg font-bold text-ruuvi-text">
+                                <span className="text-base font-bold text-ruuvi-text">
                                     {sensors.humidity?.toFixed(1) ?? '--'} <span className="text-xs font-normal text-ruuvi-text-muted">%</span>
                                 </span>
                             </div>
@@ -199,9 +214,12 @@ export function IntegrationCard({
                                         <Gauge className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Pressure</span>
                                     </div>
-                                    <span className="text-base font-bold text-ruuvi-text">
-                                        {(sensors.pressure / 100).toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">hPa</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {(sensors.pressure / 100).toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">hPa</span>
+                                    </div>
                                 </div>
                             )}
                             <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col col-span-2 sm:col-span-1 border border-ruuvi-border transition-colors duration-250">
@@ -209,9 +227,12 @@ export function IntegrationCard({
                                     <Signal className="w-3.5 h-3.5 text-ruuvi-text-muted" />
                                     <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">RSSI</span>
                                 </div>
-                                <span className="text-base font-bold text-ruuvi-text">
-                                    {sensors.rssi} <span className="text-xs font-normal text-ruuvi-text-muted">dBm</span>
-                                </span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-base font-bold text-ruuvi-text">
+                                        {sensors.rssi}
+                                    </span>
+                                    <span className="text-[10px] text-ruuvi-text-muted font-normal">dBm</span>
+                                </div>
                             </div>
 
                             {/* Extended Sensors */}
@@ -221,9 +242,12 @@ export function IntegrationCard({
                                         <span className="text-[10px] font-bold text-ruuvi-text-muted border border-ruuvi-text-muted px-1 rounded-sm">PM</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">PM2.5</span>
                                     </div>
-                                    <span className="text-base font-bold text-ruuvi-text">
-                                        {sensors.pm2p5.toFixed(1)} <span className="text-xs font-normal text-ruuvi-text-muted">µg/m³</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.pm2p5.toFixed(1)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">µg/m³</span>
+                                    </div>
                                 </div>
                             )}
                             {sensors.co2 !== undefined && (
@@ -232,15 +256,18 @@ export function IntegrationCard({
                                         <span className="text-[10px] font-bold text-ruuvi-success border border-ruuvi-success px-1 rounded-sm">CO2</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">CO2</span>
                                     </div>
-                                    <span className="text-base font-bold text-ruuvi-text">
-                                        {sensors.co2.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">ppm</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.co2.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">ppm</span>
+                                    </div>
                                 </div>
                             )}
                             {sensors.voc !== undefined && (
                                 <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <span className="text-[10px] font-bold text-orange-400 border border-orange-400 px-1 rounded-sm">VOC</span>
+                                        <span className="text-[10px] font-bold text-ruuvi-accent border border-ruuvi-accent px-1 rounded-sm">VOC</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Index</span>
                                     </div>
                                     <span className="text-base font-bold text-ruuvi-text">
@@ -251,7 +278,7 @@ export function IntegrationCard({
                             {sensors.nox !== undefined && (
                                 <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <span className="text-[10px] font-bold text-red-400 border border-red-400 px-1 rounded-sm">NOX</span>
+                                        <span className="text-[10px] font-bold text-red-500 border border-red-500 px-1 rounded-sm">NOX</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Index</span>
                                     </div>
                                     <span className="text-base font-bold text-ruuvi-text">
@@ -265,9 +292,12 @@ export function IntegrationCard({
                                         <Sun className="w-3.5 h-3.5 text-ruuvi-accent" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Light</span>
                                     </div>
-                                    <span className="text-base font-bold text-ruuvi-text">
-                                        {sensors.illuminance.toFixed(0)} <span className="text-xs font-normal text-ruuvi-text-muted">lx</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.illuminance.toFixed(0)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">lx</span>
+                                    </div>
                                 </div>
                             )}
                             {sensors.voltage !== undefined && (
@@ -276,15 +306,18 @@ export function IntegrationCard({
                                         <Battery className="w-3.5 h-3.5 text-ruuvi-success" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Battery</span>
                                     </div>
-                                    <span className="text-base font-bold text-ruuvi-text">
-                                        {sensors.voltage.toFixed(2)} <span className="text-xs font-normal text-ruuvi-text-muted">V</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.voltage.toFixed(2)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">V</span>
+                                    </div>
                                 </div>
                             )}
                             {sensors.movement_counter !== undefined && (
                                 <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <Activity className="w-3.5 h-3.5 text-purple-400" />
+                                        <Activity className="w-3.5 h-3.5 text-ruuvi-accent" />
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Moves</span>
                                     </div>
                                     <span className="text-base font-bold text-ruuvi-text">
@@ -295,12 +328,15 @@ export function IntegrationCard({
                             {sensors.sound_average !== undefined && (
                                 <div className="bg-ruuvi-input-bg rounded-lg p-2 flex flex-col border border-ruuvi-border transition-colors duration-250">
                                     <div className="flex items-center gap-1.5 mb-0.5">
-                                        <span className="text-[10px] font-bold text-blue-400">dB</span>
+                                        <span className="text-[10px] font-bold text-blue-500">dB</span>
                                         <span className="text-[10px] text-ruuvi-text-muted uppercase tracking-wider">Sound</span>
                                     </div>
-                                    <span className="text-base font-bold text-ruuvi-text">
-                                        {sensors.sound_average.toFixed(1)} <span className="text-xs font-normal text-ruuvi-text-muted">dB</span>
-                                    </span>
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-base font-bold text-ruuvi-text">
+                                            {sensors.sound_average.toFixed(1)}
+                                        </span>
+                                        <span className="text-[10px] text-ruuvi-text-muted font-normal">dB</span>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -324,7 +360,7 @@ export function IntegrationCard({
                                 <span className="text-xs font-medium text-ruuvi-text leading-none">{isEnabled ? 'Enabled' : 'Disabled'}</span>
                                 <button
                                     onClick={() => onToggleEnabled(!isEnabled)}
-                                    className={`relative inline-flex h-4.5 w-8 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ruuvi-success focus:ring-offset-2 focus:ring-offset-ruuvi-card ${isEnabled ? 'bg-ruuvi-success' : 'bg-gray-600'
+                                    className={`relative inline-flex h-4.5 w-8 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ruuvi-success focus:ring-offset-2 focus:ring-offset-ruuvi-card ${isEnabled ? 'bg-ruuvi-success' : 'bg-ruuvi-toggle-bg border border-ruuvi-border'
                                         }`}
                                     role="switch"
                                     aria-checked={isEnabled}
@@ -354,7 +390,7 @@ export function IntegrationCard({
                 {onEdit && (
                     <button
                         onClick={onEdit}
-                        className="p-1.5 text-ruuvi-text-muted hover:text-white hover:bg-ruuvi-dark rounded-lg transition-colors"
+                        className="p-1.5 text-ruuvi-text-muted hover:text-ruuvi-text hover:bg-ruuvi-input-bg rounded-lg transition-colors"
                         title="Edit name"
                     >
                         <Pencil className="w-3.5 h-3.5" />
