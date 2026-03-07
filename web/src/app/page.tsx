@@ -9,9 +9,11 @@ import { MQTTForm } from '@/components/MQTTForm';
 import { InfluxDBForm } from '@/components/InfluxDBForm';
 import { InfluxDB3Form } from '@/components/InfluxDB3Form';
 import { RuuviTagForm } from '@/components/RuuviTagForm';
-import { Bluetooth, Cloud, Database, BarChart3, Settings, RefreshCw, LayoutDashboard, SlidersHorizontal } from 'lucide-react';
+import { Bluetooth, Cloud, Database, BarChart3, Settings, RefreshCw, LayoutDashboard, SlidersHorizontal, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function Home() {
+  const { theme, toggleTheme } = useTheme();
   const [config, setConfig] = useState<Config | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [version, setVersion] = useState<string>("Unknown");
@@ -240,14 +242,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-ruuvi-dark text-ruuvi-text">
+    <div className="min-h-screen bg-ruuvi-dark text-ruuvi-text transition-colors duration-250">
       {/* Header */}
-      <header className="bg-ruuvi-card border-b border-ruuvi-dark/50">
+      <header className="bg-ruuvi-card border-b border-ruuvi-border transition-colors duration-250">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Settings className="w-6 h-6 text-ruuvi-success" />
             <div className="flex flex-col">
-              <h1 className="text-xl font-bold text-white">Ruuvi Gateway</h1>
+              <h1 className="text-xl font-bold text-ruuvi-text">Ruuvi Gateway</h1>
               <span className="text-xs text-ruuvi-text-muted">{version}</span>
             </div>
           </div>
@@ -259,7 +261,7 @@ export default function Home() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === 'dashboard'
                   ? 'bg-ruuvi-success/15 text-ruuvi-success'
-                  : 'text-ruuvi-text-muted hover:text-white hover:bg-ruuvi-dark/50'
+                  : 'text-ruuvi-text-muted hover:text-ruuvi-text hover:bg-ruuvi-dark/50'
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -270,7 +272,7 @@ export default function Home() {
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === 'configuration'
                   ? 'bg-ruuvi-success/15 text-ruuvi-success'
-                  : 'text-ruuvi-text-muted hover:text-white hover:bg-ruuvi-dark/50'
+                  : 'text-ruuvi-text-muted hover:text-ruuvi-text hover:bg-ruuvi-dark/50'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
@@ -278,7 +280,7 @@ export default function Home() {
             </button>
           </nav>
 
-          <div className="flex items-center gap-4 min-w-[180px] justify-end">
+          <div className="flex items-center gap-3 min-w-[180px] justify-end">
             {configChanged && (
               <button
                 onClick={() => setShowRestartPrompt(true)}
@@ -288,6 +290,17 @@ export default function Home() {
                 Restart to Apply
               </button>
             )}
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              className="p-2 rounded-lg transition-colors bg-ruuvi-toggle-bg hover:bg-ruuvi-text-muted/10 text-ruuvi-text-muted hover:text-ruuvi-text"
+            >
+              {theme === 'dark'
+                ? <Sun className="w-4 h-4" />
+                : <Moon className="w-4 h-4" />
+              }
+            </button>
           </div>
         </div>
       </header>
@@ -298,7 +311,7 @@ export default function Home() {
         {activeTab === 'dashboard' && (
           <section>
             <div className="mb-6 text-center">
-              <h2 className="text-2xl font-semibold text-white">Discovered Tags</h2>
+              <h2 className="text-2xl font-semibold text-ruuvi-text">Discovered Tags</h2>
               <p className="text-ruuvi-text-muted mt-1">Nearby RuuviTags detected by the scanner</p>
             </div>
 
@@ -356,7 +369,7 @@ export default function Home() {
         {activeTab === 'configuration' && (
           <section>
             <div className="mb-6 text-center">
-              <h2 className="text-2xl font-semibold text-white">Data Sinks</h2>
+              <h2 className="text-2xl font-semibold text-ruuvi-text">Data Sinks</h2>
               <p className="text-ruuvi-text-muted mt-1">Configure where tag data is forwarded</p>
             </div>
 
@@ -415,7 +428,7 @@ export default function Home() {
       {showRestartPrompt && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-ruuvi-card border border-ruuvi-text-muted/10 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold text-white mb-2">Restart Required</h3>
+            <h3 className="text-lg font-bold text-ruuvi-text mb-2">Restart Required</h3>
             <p className="text-ruuvi-text-muted mb-6">
               Configuration changes have been saved. The gateway needs to restart for changes to take effect.
             </p>

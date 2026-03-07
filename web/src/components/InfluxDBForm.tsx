@@ -22,12 +22,12 @@ export function InfluxDBForm({ initialConfig, onChange }: InfluxDBFormProps) {
         onChange({ ...config, [field]: value });
     };
 
-    const inputClasses = "w-full px-3 py-2 bg-ruuvi-dark border border-ruuvi-text-muted/20 rounded-lg focus:ring-2 focus:ring-ruuvi-success/50 focus:border-ruuvi-success text-sm text-white placeholder-ruuvi-text-muted/30";
+    const inputClasses = "w-full px-3 py-2 bg-ruuvi-input-bg border border-ruuvi-border rounded-lg focus:ring-2 focus:ring-ruuvi-success/50 focus:border-ruuvi-success text-sm text-ruuvi-text placeholder-ruuvi-text-muted/30 transition-colors duration-250";
     const labelClasses = "text-sm font-medium text-ruuvi-text-muted";
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 bg-ruuvi-dark/30 rounded-lg border border-ruuvi-text-muted/10">
+            <div className="flex items-center gap-3 p-3 bg-ruuvi-input-bg rounded-lg border border-ruuvi-border transition-colors duration-250">
                 <input
                     type="checkbox"
                     id="enabled"
@@ -35,7 +35,7 @@ export function InfluxDBForm({ initialConfig, onChange }: InfluxDBFormProps) {
                     onChange={(e) => handleChange('enabled', e.target.checked)}
                     className="w-4 h-4 text-ruuvi-success rounded border-ruuvi-text-muted/30 focus:ring-ruuvi-success bg-ruuvi-dark"
                 />
-                <label htmlFor="enabled" className="text-sm font-bold text-white cursor-pointer select-none">Enable InfluxDB Publisher</label>
+                <label htmlFor="enabled" className="text-sm font-bold text-ruuvi-text cursor-pointer select-none">Enable InfluxDB Publisher</label>
             </div>
 
             <div className="space-y-1">

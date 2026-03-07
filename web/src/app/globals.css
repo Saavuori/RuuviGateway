@@ -1,5 +1,29 @@
 @import "tailwindcss";
 
+:root {
+  --color-ruuvi-dark: #142928;
+  --color-ruuvi-card: #1e3b3a;
+  --color-ruuvi-text: #ffffff;
+  --color-ruuvi-text-muted: #a6b6b5;
+  --color-ruuvi-accent: #e8d64b;
+  --color-ruuvi-success: #4fdfa8;
+  --color-ruuvi-border: rgba(166, 182, 181, 0.12);
+  --color-ruuvi-input-bg: rgba(0, 0, 0, 0.2);
+  --color-ruuvi-toggle-bg: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="light"] {
+  --color-ruuvi-dark: #f8fafc;
+  --color-ruuvi-card: #ffffff;
+  --color-ruuvi-text: #0f172a;
+  --color-ruuvi-text-muted: #475569;
+  --color-ruuvi-accent: #d97706; /* Darker amber for light mode readability */
+  --color-ruuvi-success: #059669; /* Darker emerald for light mode readability */
+  --color-ruuvi-border: #e2e8f0;
+  --color-ruuvi-input-bg: #f1f5f9;
+  --color-ruuvi-toggle-bg: #e2e8f0;
+}
+
 @theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -7,14 +31,24 @@
   /* Custom breakpoint for ultra-wide displays */
   --breakpoint-3xl: 1920px;
 
-  --color-ruuvi-dark: #142928;
-  --color-ruuvi-card: #1e3b3a;
-  --color-ruuvi-text: #ffffff;
-  --color-ruuvi-text-muted: #a6b6b5;
-  --color-ruuvi-accent: #e8d64b;
-  --color-ruuvi-success: #4fdfa8;
+  /* Theme variables mapped back to colors */
+  --color-ruuvi-dark: var(--color-ruuvi-dark);
+  --color-ruuvi-card: var(--color-ruuvi-card);
+  --color-ruuvi-text: var(--color-ruuvi-text);
+  --color-ruuvi-text-muted: var(--color-ruuvi-text-muted);
+  --color-ruuvi-accent: var(--color-ruuvi-accent);
+  --color-ruuvi-success: var(--color-ruuvi-success);
+  --color-ruuvi-border: var(--color-ruuvi-border);
+  --color-ruuvi-input-bg: var(--color-ruuvi-input-bg);
+  --color-ruuvi-toggle-bg: var(--color-ruuvi-toggle-bg);
 }
 
 body {
   @apply bg-ruuvi-dark text-ruuvi-text antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Base border styles since we use border-ruuvi-border a lot */
+.border-theme-default {
+  border-color: var(--color-ruuvi-border);
 }
