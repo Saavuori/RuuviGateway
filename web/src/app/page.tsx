@@ -9,13 +9,14 @@ import { MQTTForm } from '@/components/MQTTForm';
 import { InfluxDBForm } from '@/components/InfluxDBForm';
 import { InfluxDB3Form } from '@/components/InfluxDB3Form';
 import { RuuviTagForm } from '@/components/RuuviTagForm';
-import { Bluetooth, Radio, Cloud, Database, BarChart3, Settings, Plus, Check, RefreshCw } from 'lucide-react';
+import { Bluetooth, Cloud, Database, BarChart3, Settings, RefreshCw, LayoutDashboard, SlidersHorizontal } from 'lucide-react';
 
 export default function Home() {
   const [config, setConfig] = useState<Config | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [version, setVersion] = useState<string>("Unknown");
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'configuration'>('dashboard');
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -246,18 +247,45 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Settings className="w-6 h-6 text-ruuvi-success" />
             <div className="flex flex-col">
-              <h1 className="text-xl font-bold text-white">Ruuvi Gateway Management</h1>
+              <h1 className="text-xl font-bold text-white">Ruuvi Gateway</h1>
               <span className="text-xs text-ruuvi-text-muted">{version}</span>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+
+          {/* Tab navigation */}
+          <nav className="flex items-center gap-1">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'dashboard'
+                  ? 'bg-ruuvi-success/15 text-ruuvi-success'
+                  : 'text-ruuvi-text-muted hover:text-white hover:bg-ruuvi-dark/50'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4" />
+              Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab('configuration')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'configuration'
+                  ? 'bg-ruuvi-success/15 text-ruuvi-success'
+                  : 'text-ruuvi-text-muted hover:text-white hover:bg-ruuvi-dark/50'
+              }`}
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              Configuration
+            </button>
+          </nav>
+
+          <div className="flex items-center gap-4 min-w-[180px] justify-end">
             {configChanged && (
               <button
                 onClick={() => setShowRestartPrompt(true)}
                 className="flex items-center gap-2 px-3 py-1.5 text-sm font-bold text-ruuvi-dark bg-ruuvi-accent hover:bg-ruuvi-accent/90 rounded-lg transition-all animate-pulse shadow-glow"
               >
                 <RefreshCw className="w-4 h-4" />
-                Restart to Apply Changes
+                Restart to Apply
               </button>
             )}
           </div>
@@ -265,83 +293,88 @@ export default function Home() {
       </header>
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-        {/* Discovered Section */}
-        <section>
-          <div className="mb-6 text-center">
-            <h2 className="text-2xl font-semibold text-white">Discovered</h2>
-            <p className="text-ruuvi-text-muted mt-1">Nearby RuuviTags detected by the scanner</p>
-          </div>
 
-          <div className="flex flex-wrap gap-6 justify-center">
-            {tags
-              .sort((a, b) => a.mac.localeCompare(b.mac))
-              .map((tag) => (
-                <IntegrationCard
-                  key={tag.mac}
-                  title={getTagName(tag.mac) || `RuuviTag ${tag.mac.slice(-5)}`}
-                  subtitle={tag.mac}
-                  description="" // Not used when sensors are provided
-                  icon={Bluetooth}
-                  dataFormat={tag.data_format}
-                  sensors={{
-                    temperature: tag.temperature,
-                    humidity: tag.humidity,
-                    pressure: tag.pressure,
-                    voltage: tag.battery_voltage,
-                    rssi: tag.rssi,
-                    pm2p5: tag.pm2p5,
-                    co2: tag.co2,
-                    voc: tag.voc,
-                    nox: tag.nox,
-                    illuminance: tag.illuminance,
-                    sound_average: tag.sound_average,
-                    movement_counter: tag.movement_counter,
-                    air_quality_index: tag.air_quality_index
-                  }}
-                  onConfigure={() => openTagModal(tag)}
-                  lastSeen={tag.last_seen}
-                  isEnabled={isTagEnabled(tag.mac)}
-                  onToggleEnabled={async (enabled) => {
-                    try {
-                      const result = await enableTag(tag.mac, enabled);
-                      if (result.success) {
-                        setConfig(prev => prev ? { ...prev, enabled_tags: result.enabled_tags } : null);
-                        // No restart required - change takes effect immediately
+        {/* === Dashboard Tab === */}
+        {activeTab === 'dashboard' && (
+          <section>
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-semibold text-white">Discovered Tags</h2>
+              <p className="text-ruuvi-text-muted mt-1">Nearby RuuviTags detected by the scanner</p>
+            </div>
+
+            <div className="flex flex-wrap gap-6 justify-center">
+              {tags
+                .sort((a, b) => a.mac.localeCompare(b.mac))
+                .map((tag) => (
+                  <IntegrationCard
+                    key={tag.mac}
+                    title={getTagName(tag.mac) || `RuuviTag ${tag.mac.slice(-5)}`}
+                    subtitle={tag.mac}
+                    description=""
+                    icon={Bluetooth}
+                    dataFormat={tag.data_format}
+                    sensors={{
+                      temperature: tag.temperature,
+                      humidity: tag.humidity,
+                      pressure: tag.pressure,
+                      voltage: tag.battery_voltage,
+                      rssi: tag.rssi,
+                      pm2p5: tag.pm2p5,
+                      co2: tag.co2,
+                      voc: tag.voc,
+                      nox: tag.nox,
+                      illuminance: tag.illuminance,
+                      sound_average: tag.sound_average,
+                      movement_counter: tag.movement_counter,
+                      air_quality_index: tag.air_quality_index
+                    }}
+                    onConfigure={() => openTagModal(tag)}
+                    lastSeen={tag.last_seen}
+                    isEnabled={isTagEnabled(tag.mac)}
+                    onToggleEnabled={async (enabled) => {
+                      try {
+                        const result = await enableTag(tag.mac, enabled);
+                        if (result.success) {
+                          setConfig(prev => prev ? { ...prev, enabled_tags: result.enabled_tags } : null);
+                        }
+                      } catch (e) {
+                        console.error('Failed to toggle tag:', e);
                       }
-                    } catch (e) {
-                      console.error('Failed to toggle tag:', e);
-                    }
-                  }}
+                    }}
+                  />
+                ))}
+              {tags.length === 0 && (
+                <div className="col-span-full py-12 text-center text-ruuvi-text-muted bg-ruuvi-card/50 rounded-xl border border-dashed border-ruuvi-text-muted/20">
+                  No tags discovered yet.
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* === Configuration Tab === */}
+        {activeTab === 'configuration' && (
+          <section>
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-semibold text-white">Data Sinks</h2>
+              <p className="text-ruuvi-text-muted mt-1">Configure where tag data is forwarded</p>
+            </div>
+
+            <div className="flex flex-wrap gap-6 justify-center">
+              {sinks.map((sink) => (
+                <IntegrationCard
+                  key={sink.id}
+                  title={sink.title}
+                  description={sink.desc}
+                  icon={sink.icon}
+                  status={sink.enabled ? 'active' : 'inactive'}
+                  onConfigure={() => handleConfigure(sink.id)}
                 />
               ))}
-            {tags.length === 0 && (
-              <div className="col-span-full py-12 text-center text-ruuvi-text-muted bg-ruuvi-card/50 rounded-xl border border-dashed border-ruuvi-text-muted/20">
-                No tags discovered yet.
-              </div>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        )}
 
-        {/* Configured Section */}
-        <section>
-          <div className="mb-6 text-center">
-            <h2 className="text-2xl font-semibold text-white">Configured</h2>
-            <p className="text-ruuvi-text-muted mt-1">Active data sinks and integrations</p>
-          </div>
-
-          <div className="flex flex-wrap gap-6 justify-center">
-            {sinks.map((sink) => (
-              <IntegrationCard
-                key={sink.id}
-                title={sink.title}
-                description={sink.desc}
-                icon={sink.icon}
-                status={sink.enabled ? 'active' : 'inactive'}
-                onConfigure={() => handleConfigure(sink.id)}
-              />
-            ))}
-          </div>
-        </section>
       </main>
 
       {/* Config Modal */}
