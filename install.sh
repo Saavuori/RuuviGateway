@@ -2,7 +2,7 @@
 set -e
 
 REPO="Saavuori/RuuviGateway"
-BRANCH="main"
+BRANCH="master"
 BASE_URL="https://raw.githubusercontent.com/${REPO}/${BRANCH}"
 INSTALL_DIR="${1:-ruuvigateway}"
 
