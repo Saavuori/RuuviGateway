@@ -47,9 +47,10 @@ type Tag struct {
 }
 
 var (
-	recentTags = make(map[string]Tag)
-	tagsLock   sync.RWMutex
-	configFile = "config.yml" // Default, can be overridden
+	recentTags       = make(map[string]Tag)
+	tagsLock         sync.RWMutex
+	configFile       = "config.yml" // Default, can be overridden
+	onConfigChangeFn func(config.Config)
 )
 
 func UpdateTag(m parser.Measurement) {
@@ -95,10 +96,11 @@ func UpdateTag(m parser.Measurement) {
 	recentTags[m.Mac] = tags
 }
 
-func Start(conf config.Config, confFile string) {
+func Start(conf config.Config, confFile string, onConfigChange func(config.Config)) {
 	if confFile != "" {
 		configFile = confFile
 	}
+	onConfigChangeFn = onConfigChange
 
 	mux := http.NewServeMux()
 
@@ -171,8 +173,11 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if onConfigChangeFn != nil {
+			onConfigChangeFn(newConfig)
+		}
+
 		w.WriteHeader(http.StatusOK)
-		// NOTE: Does not automatically reload the gateway. Restart required.
 	} else {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}

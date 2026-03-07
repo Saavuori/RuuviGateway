@@ -16,8 +16,12 @@ import (
 )
 
 func Run(config config.Config, configPath string) {
-	// Start Management Web UI
-	server.Start(config, configPath)
+	// Initialize SinkManager with config
+	sinkManager := NewSinkManager()
+	sinkManager.Update(config)
+
+	// Start Management Web UI (passing the sink manager callback)
+	server.Start(config, configPath, sinkManager.Update)
 
 	// Initialize enabled tags state for live updating (no restart required)
 	server.InitEnabledTags(config.EnabledTags)
@@ -27,24 +31,7 @@ func Run(config config.Config, configPath string) {
 		gwMac = "00:00:00:00:00:00"
 	}
 
-	// New Sinks Setup (Legacy MQTT/HTTP senders have been removed)
-	var sinks []chan<- parser.Measurement
-	if config.MQTTPublisher != nil && (config.MQTTPublisher.Enabled == nil || *config.MQTTPublisher.Enabled) {
-		sinks = append(sinks, data_sinks.MQTT(*config.MQTTPublisher, config.TagNames))
-	}
-	if config.InfluxDBPublisher != nil && (config.InfluxDBPublisher.Enabled == nil || *config.InfluxDBPublisher.Enabled) {
-		sinks = append(sinks, data_sinks.InfluxDB(*config.InfluxDBPublisher))
-	}
-	if config.InfluxDB3Publisher != nil && (config.InfluxDB3Publisher.Enabled == nil || *config.InfluxDB3Publisher.Enabled) {
-		sinks = append(sinks, data_sinks.InfluxDB3(*config.InfluxDB3Publisher))
-	}
-	if config.Prometheus != nil && (config.Prometheus.Enabled == nil || *config.Prometheus.Enabled) {
-		sinks = append(sinks, data_sinks.Prometheus(*config.Prometheus))
-	}
 
-	if len(sinks) == 0 {
-		log.Warn("No sinks configured. Configure via Web UI.")
-	}
 
 	advHandler := func(adv ble.Advertisement) {
 		data := adv.ManufacturerData()
@@ -83,15 +70,9 @@ func Run(config config.Config, configPath string) {
 					// Update Web UI Cache (always, for discovery)
 					server.UpdateTag(measurement)
 
-					// Send to sinks only if tag is enabled (checked from live state)
+					// Send to active sinks (SinkManager routes it automatically)
 					if server.IsTagEnabled(measurement.Mac) {
-						for _, sink := range sinks {
-							select {
-							case sink <- measurement:
-							case <-time.After(100 * time.Millisecond):
-								log.Warn("Sink channel full, measurement dropped")
-							}
-						}
+						sinkManager.Push(measurement)
 					}
 				}
 			}
