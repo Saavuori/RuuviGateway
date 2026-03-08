@@ -9,7 +9,7 @@ import { MQTTForm } from '@/components/MQTTForm';
 import { InfluxDBForm } from '@/components/InfluxDBForm';
 import { InfluxDB3Form } from '@/components/InfluxDB3Form';
 import { RuuviTagForm } from '@/components/RuuviTagForm';
-import { Bluetooth, Cloud, Database, BarChart3, Settings, RefreshCw, LayoutDashboard, SlidersHorizontal, Sun, Moon } from 'lucide-react';
+import { Bluetooth, Cloud, Database, BarChart3, Settings, RefreshCw, LayoutDashboard, SlidersHorizontal, Sun, Moon, Download, Upload } from 'lucide-react';
 import { useTheme } from '@/components/ThemeProvider';
 
 export default function Home() {
@@ -76,19 +76,76 @@ export default function Home() {
     setIsSaving(true);
 
     try {
-      // ... (config construction remains same)
       const newConfig = { ...config };
+      
+      // Merge formData into the corresponding sink config
+      if (activeSinkId === 'mqtt_publisher') {
+        newConfig.mqtt_publisher = formData;
+      } else if (activeSinkId === 'influxdb_publisher') {
+        newConfig.influxdb_publisher = formData;
+      } else if (activeSinkId === 'influxdb3_publisher') {
+        newConfig.influxdb3_publisher = formData;
+      } else if (activeSinkId === 'prometheus') {
+        newConfig.prometheus = formData;
+      }
 
       await updateConfig(newConfig);
       setConfig(newConfig);
       setIsModalOpen(false);
-      setConfigChanged(true); // Mark config as changed
-      setShowRestartPrompt(false); // Do not auto-show prompt, just show button
+      // Removed setConfigChanged(true) since backend sink manager supports live reload
     } catch (e) {
       alert('Failed to save config: ' + e);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleExportConfig = async () => {
+    try {
+      const configData = await fetchConfig();
+      const jsonString = JSON.stringify(configData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ruuvi-gateway-config.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export config:', error);
+      alert('Failed to export config. Please try again.');
+    }
+  };
+
+  const handleImportConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const content = e.target?.result as string;
+        const parsedConfig = JSON.parse(content);
+        
+        setIsSaving(true);
+        await updateConfig(parsedConfig);
+        setConfig(parsedConfig);
+        setConfigChanged(true);
+        setShowRestartPrompt(true); // Show restart prompt as the config changes are likely major
+        
+      } catch (error) {
+        console.error('Failed to import config:', error);
+        alert('Invalid configuration file. Please ensure it is a valid JSON config.');
+      } finally {
+        setIsSaving(false);
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so the same file can be selected again if needed
+    event.target.value = '';
   };
 
   const handleRestart = async () => {
@@ -384,6 +441,35 @@ export default function Home() {
                   onConfigure={() => handleConfigure(sink.id)}
                 />
               ))}
+            </div>
+
+            {/* Backup & Restore Section */}
+            <div className="mt-12 pt-8 border-t border-ruuvi-border">
+              <div className="mb-6 text-center">
+                <h3 className="text-xl font-semibold text-ruuvi-text">Backup & Restore</h3>
+                <p className="text-sm text-ruuvi-text-muted mt-1">Import or export your gateway configuration</p>
+              </div>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={handleExportConfig}
+                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors bg-ruuvi-card border border-ruuvi-border hover:border-ruuvi-text-muted/30 text-ruuvi-text hover:bg-ruuvi-card/80 shadow-sm"
+                >
+                  <Download className="w-5 h-5 text-ruuvi-success" />
+                  Export Configuration
+                </button>
+                
+                <label className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-colors bg-ruuvi-card border border-ruuvi-border hover:border-ruuvi-text-muted/30 text-ruuvi-text hover:bg-ruuvi-card/80 shadow-sm cursor-pointer disabled:opacity-50">
+                  <Upload className="w-5 h-5 text-ruuvi-accent" />
+                  Import Configuration
+                  <input
+                    type="file"
+                    accept=".json"
+                    className="hidden"
+                    onChange={handleImportConfig}
+                    disabled={isSaving}
+                  />
+                </label>
+              </div>
             </div>
           </section>
         )}
