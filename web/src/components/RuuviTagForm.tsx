@@ -16,9 +16,12 @@ interface Tag3DProps {
 
 function Tag3D({ x, y, z }: Tag3DProps) {
     // Calculate Pitch (rotation about X) and Roll (rotation about Y)
-    // We assume Z is normal to the tag surface, X is "up/down" on the tag, Y is "left/right"
     const pitch = Math.atan2(y, z) * (180 / Math.PI);
     const roll = Math.atan2(-x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
+
+    // Thickness settings (RuuviTag is ~14mm thick)
+    const thickness = 14; 
+    const layers = [...Array(thickness)];
 
     return (
         <div className="relative w-32 h-32 [perspective:800px] flex items-center justify-center">
@@ -30,36 +33,45 @@ function Tag3D({ x, y, z }: Tag3DProps) {
                 }}
             >
                 {/* Front Face (Top of RuuviTag) */}
-                <div className="absolute inset-0 rounded-full bg-ruuvi-input-bg border-[3px] border-ruuvi-border shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-center [backface-visibility:hidden] [transform:translateZ(6px)]">
+                <div className="absolute inset-0 rounded-full bg-ruuvi-input-bg border-[3px] border-ruuvi-border shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-center [backface-visibility:hidden] [transform:translateZ(${thickness/2}px)]">
                     <div className="w-20 h-20 rounded-full border border-ruuvi-success/20 flex flex-col items-center justify-center gap-1">
                         <div className="w-4 h-4 rounded-full bg-ruuvi-success/20 animate-pulse" />
                         <span className="text-[6px] text-ruuvi-text-muted font-bold tracking-widest uppercase">Ruuvi</span>
                     </div>
                     {/* Glossy overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent rounded-full" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent rounded-full" />
                 </div>
 
                 {/* Side/Thickness (using multiple layers for depth) */}
-                {[...Array(6)].map((_, i) => (
-                    <div 
-                        key={i}
-                        className="absolute inset-0 rounded-full border-[3px] border-ruuvi-border/40"
-                        style={{ transform: `translateZ(${i}px)` }}
-                    />
-                ))}
+                {layers.map((_, i) => {
+                    const depth = i - (thickness / 2);
+                    // Add shading: darker layers in the middle
+                    const opacity = 0.4 + (Math.abs(depth) / thickness) * 0.4;
+                    return (
+                        <div 
+                            key={i}
+                            className="absolute inset-0 rounded-full border-[2px] border-ruuvi-border"
+                            style={{ 
+                                transform: `translateZ(${depth}px)`,
+                                borderColor: `rgba(var(--ruuvi-border-rgb, 100, 100, 100), ${opacity})`,
+                                backgroundColor: i === 0 || i === thickness - 1 ? 'transparent' : 'rgba(15, 23, 42, 0.8)'
+                            }}
+                        />
+                    );
+                })}
 
                 {/* Back Face */}
-                <div className="absolute inset-0 rounded-full bg-ruuvi-toggle-bg border-[3px] border-ruuvi-border [backface-visibility:hidden] [transform:rotateY(180deg) translateZ(0)]" />
+                <div className="absolute inset-0 rounded-full bg-ruuvi-toggle-bg border-[3px] border-ruuvi-border [backface-visibility:hidden] [transform:rotateY(180deg) translateZ(${thickness/2}px)]" />
                 
                 {/* Directional Indicator (Small notch/arrow for "up") */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-ruuvi-success/50 rounded-full [transform:translateZ(7px)]" />
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-ruuvi-success rounded-full [transform:translateZ(${thickness/2 + 1}px)] shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
             </div>
 
             {/* Ambient Shadow on floor */}
             <div 
-                className="absolute inset-x-8 bottom-0 h-4 bg-black/40 blur-xl rounded-full transition-transform duration-700 ease-out"
+                className="absolute inset-x-8 bottom-0 h-4 bg-black/50 blur-xl rounded-full transition-transform duration-700 ease-out"
                 style={{
-                    transform: `translateX(${-roll/2}px) scaleX(${1 + Math.abs(pitch)/90})`
+                    transform: `translateX(${-roll/1.5}px) scaleX(${1.2 + Math.abs(pitch)/90}) scaleY(${1 + Math.abs(pitch)/180})`
                 }}
             />
         </div>
@@ -149,7 +161,7 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
                     <div className="p-3 bg-ruuvi-input-bg rounded-lg border border-ruuvi-border transition-colors duration-250">
                         <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Battery</div>
                         <div className="text-xl font-bold text-ruuvi-text">
-                            {tag.battery_voltage ? (tag.battery_voltage / 1000).toFixed(2) : '--'} <span className="text-sm font-normal text-ruuvi-text-muted">V</span>
+                            {tag.battery_voltage?.toFixed(2) ?? '--'} <span className="text-sm font-normal text-ruuvi-text-muted">V</span>
                         </div>
                     </div>
                 </div>

@@ -34,7 +34,7 @@ export default function Home() {
   const [configChanged, setConfigChanged] = useState(false);
 
   // Tag Modal State
-  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
+  const [selectedTagMac, setSelectedTagMac] = useState<string | null>(null);
   const [tagModalName, setTagModalName] = useState('');
   const [tagModalEnabled, setTagModalEnabled] = useState(false);
   const [initialTagName, setInitialTagName] = useState('');
@@ -184,21 +184,21 @@ export default function Home() {
   const saveTagSettings = async () => {
     setIsSaving(true);
     try {
-      if (!selectedTag || !config) return;
+      if (!selectedTagMac || !config) return;
       let nameChanged = false;
-      const nameResult = await setTagName(selectedTag.mac, tagModalName);
+      const nameResult = await setTagName(selectedTagMac, tagModalName);
       if (nameResult.success) {
         setConfig({ ...config, tag_names: nameResult.tag_names });
         nameChanged = tagModalName !== initialTagName;
       }
-      const enableResult = await enableTag(selectedTag.mac, tagModalEnabled);
+      const enableResult = await enableTag(selectedTagMac, tagModalEnabled);
       if (enableResult.success) {
         setConfig(prev => prev ? { ...prev, enabled_tags: enableResult.enabled_tags } : null);
         // Enable/disable takes effect immediately - no restart needed
       }
       // Only name changes require restart (for data sink topic names etc.)
       if (nameChanged) setConfigChanged(true);
-      setSelectedTag(null);
+      setSelectedTagMac(null);
     } catch (e) {
       alert('Failed to save: ' + e);
     } finally {
@@ -225,7 +225,7 @@ export default function Home() {
   const openTagModal = (tag: Tag) => {
     const name = getTagName(tag.mac) || '';
     const enabled = isTagEnabled(tag.mac);
-    setSelectedTag(tag);
+    setSelectedTagMac(tag.mac);
     setTagModalName(name);
     setTagModalEnabled(enabled);
     setInitialTagName(name);
@@ -589,22 +589,25 @@ export default function Home() {
 
       {/* Tag Editing Modal */}
       <Modal
-        isOpen={!!selectedTag}
-        onClose={() => setSelectedTag(null)}
-        title={getTagName(selectedTag?.mac || '') || `RuuviTag ${selectedTag?.mac?.slice(-5) || ''}`}
+        isOpen={!!selectedTagMac}
+        onClose={() => setSelectedTagMac(null)}
+        title={getTagName(selectedTagMac || '') || `RuuviTag ${selectedTagMac?.slice(-5) || ''}`}
         onSubmit={saveTagSettings}
         isSaving={isSaving}
         isFormDirty={isTagFormDirty}
       >
-        {selectedTag && (
-          <RuuviTagForm
-            tag={selectedTag}
-            tagName={tagModalName}
-            enabled={tagModalEnabled}
-            onNameChange={setTagModalName}
-            onEnabledChange={setTagModalEnabled}
-          />
-        )}
+        {selectedTagMac && (() => {
+          const tag = tags.find(t => t.mac === selectedTagMac);
+          return tag ? (
+            <RuuviTagForm
+              tag={tag}
+              tagName={tagModalName}
+              enabled={tagModalEnabled}
+              onNameChange={setTagModalName}
+              onEnabledChange={setTagModalEnabled}
+            />
+          ) : null;
+        })()}
       </Modal>
     </div>
   );
