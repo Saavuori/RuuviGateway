@@ -64,7 +64,7 @@ export function IntegrationCard({
     }
 
     return (
-        <div className="bg-ruuvi-card rounded-xl shadow-lg border border-ruuvi-border p-4 flex flex-col h-auto hover:shadow-xl transition-shadow relative overflow-hidden w-56 transition-colors duration-250">
+        <div className={`bg-ruuvi-card rounded-xl shadow-lg border border-ruuvi-border p-4 flex flex-col h-auto hover:shadow-xl transition-shadow relative overflow-hidden transition-colors duration-250 ${isRuuviTag ? 'w-56' : 'w-auto min-w-fit max-w-full px-5 py-4'}`}>
             {/* Header: Bluetooth icon + (Name / MAC stack) */}
             <div className="flex items-start gap-3 mb-3 z-10 relative">
                 <div className="p-2 bg-ruuvi-input-bg rounded-full shrink-0 mt-0.5">
@@ -72,7 +72,7 @@ export function IntegrationCard({
                 </div>
                 <div className="flex-1 min-w-0 pt-0.5">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                        <h3 className="font-bold text-base text-ruuvi-text leading-tight truncate flex-1">{title}</h3>
+                        <h3 className={`font-bold text-base text-ruuvi-text leading-tight flex-1 ${isRuuviTag ? 'truncate' : ''}`}>{title}</h3>
                         {/* Pencil edit icon — stays close to name */}
                         {isRuuviTag && onConfigure && (
                             <button
@@ -83,26 +83,23 @@ export function IntegrationCard({
                                 <Pencil className="w-3.5 h-3.5" />
                             </button>
                         )}
+                        {/* Status badge for sinks */}
+                        {!isRuuviTag && status && (
+                            <span className={`shrink-0 px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full ${status === 'active' ? 'bg-ruuvi-success/20 text-ruuvi-success' :
+                                status === 'new' ? 'bg-blue-500/20 text-blue-300' :
+                                    'bg-gray-700 text-gray-400'
+                                }`}>
+                                {status}
+                            </span>
+                        )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mt-0.5">
                         {(subtitle || description) && (
-                            <p className="text-[11px] text-ruuvi-text-muted font-mono truncate flex-1 min-w-0">{subtitle || description}</p>
+                            <p className={`text-[12px] text-ruuvi-text-muted font-mono flex-1 min-w-0 ${isRuuviTag ? 'truncate' : ''}`}>{subtitle || description}</p>
                         )}
                     </div>
                 </div>
             </div>
-
-            {/* Status badge for sinks (shown inline near header) */}
-            {!isRuuviTag && status && (
-                <div className="absolute top-4 right-4">
-                    <span className={`shrink-0 px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase rounded-full ${status === 'active' ? 'bg-ruuvi-success/20 text-ruuvi-success' :
-                        status === 'new' ? 'bg-blue-500/20 text-blue-300' :
-                            'bg-gray-700 text-gray-400'
-                        }`}>
-                        {status}
-                    </span>
-                </div>
-            )}
 
             {/* Sensor Grid (Only if sensors provided) */}
             {sensors && (
