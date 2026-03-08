@@ -107,9 +107,10 @@ export default function Home() {
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       
+      const dateString = new Date().toISOString().split('T')[0];
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'ruuvi-gateway-config.json';
+      a.download = `ruuvi-gateway-config-${dateString}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
