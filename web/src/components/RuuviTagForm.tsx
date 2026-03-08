@@ -8,6 +8,64 @@ interface RuuviTagFormProps {
     onEnabledChange: (enabled: boolean) => void;
 }
 
+interface Tag3DProps {
+    x: number;
+    y: number;
+    z: number;
+}
+
+function Tag3D({ x, y, z }: Tag3DProps) {
+    // Calculate Pitch (rotation about X) and Roll (rotation about Y)
+    // We assume Z is normal to the tag surface, X is "up/down" on the tag, Y is "left/right"
+    const pitch = Math.atan2(y, z) * (180 / Math.PI);
+    const roll = Math.atan2(-x, Math.sqrt(y * y + z * z)) * (180 / Math.PI);
+
+    return (
+        <div className="relative w-32 h-32 [perspective:800px] flex items-center justify-center">
+            {/* The Tag Model */}
+            <div 
+                className="w-28 h-28 relative [transform-style:preserve-3d] transition-transform duration-700 ease-out"
+                style={{ 
+                    transform: `rotateX(${pitch}deg) rotateY(${roll}deg)` 
+                }}
+            >
+                {/* Front Face (Top of RuuviTag) */}
+                <div className="absolute inset-0 rounded-full bg-ruuvi-input-bg border-[3px] border-ruuvi-border shadow-[0_0_30px_rgba(0,0,0,0.5)] flex items-center justify-center [backface-visibility:hidden] [transform:translateZ(6px)]">
+                    <div className="w-20 h-20 rounded-full border border-ruuvi-success/20 flex flex-col items-center justify-center gap-1">
+                        <div className="w-4 h-4 rounded-full bg-ruuvi-success/20 animate-pulse" />
+                        <span className="text-[6px] text-ruuvi-text-muted font-bold tracking-widest uppercase">Ruuvi</span>
+                    </div>
+                    {/* Glossy overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent rounded-full" />
+                </div>
+
+                {/* Side/Thickness (using multiple layers for depth) */}
+                {[...Array(6)].map((_, i) => (
+                    <div 
+                        key={i}
+                        className="absolute inset-0 rounded-full border-[3px] border-ruuvi-border/40"
+                        style={{ transform: `translateZ(${i}px)` }}
+                    />
+                ))}
+
+                {/* Back Face */}
+                <div className="absolute inset-0 rounded-full bg-ruuvi-toggle-bg border-[3px] border-ruuvi-border [backface-visibility:hidden] [transform:rotateY(180deg) translateZ(0)]" />
+                
+                {/* Directional Indicator (Small notch/arrow for "up") */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-ruuvi-success/50 rounded-full [transform:translateZ(7px)]" />
+            </div>
+
+            {/* Ambient Shadow on floor */}
+            <div 
+                className="absolute inset-x-8 bottom-0 h-4 bg-black/40 blur-xl rounded-full transition-transform duration-700 ease-out"
+                style={{
+                    transform: `translateX(${-roll/2}px) scaleX(${1 + Math.abs(pitch)/90})`
+                }}
+            />
+        </div>
+    );
+}
+
 export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledChange }: RuuviTagFormProps) {
     const inputClasses = "w-full px-3 py-2 bg-ruuvi-input-bg border border-ruuvi-border rounded-lg focus:ring-2 focus:ring-ruuvi-success/50 focus:border-ruuvi-success text-sm text-ruuvi-text placeholder-ruuvi-text-muted/30 transition-colors duration-250";
     const labelClasses = "text-sm font-medium text-ruuvi-text-muted";
@@ -133,32 +191,50 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
             {/* Acceleration */}
             {(tag.acceleration_x !== undefined || tag.acceleration_total !== undefined) && (
                 <div className="border-t border-ruuvi-border pt-4">
-                    <h4 className="text-sm font-bold text-ruuvi-text mb-3">Motion & Acceleration</h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                        {tag.acceleration_total !== undefined && (
-                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
-                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Total Accel.</div>
-                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_total.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                    <h4 className="text-sm font-bold text-ruuvi-text mb-3">Motion & Orientation</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        {/* 3D Visual */}
+                        <div className="relative py-8 flex flex-col items-center justify-center bg-black/10 rounded-xl border border-ruuvi-border/30 overflow-hidden">
+                            <div className="absolute inset-0 bg-radial-gradient from-ruuvi-success/5 via-transparent to-transparent opacity-50" />
+                            <Tag3D
+                                x={tag.acceleration_x ?? 0}
+                                y={tag.acceleration_y ?? 0}
+                                z={tag.acceleration_z ?? 1}
+                            />
+                            <div className="mt-8 flex gap-4 text-[10px] items-center text-ruuvi-text-muted font-mono bg-ruuvi-input-bg/80 px-3 py-1 rounded-full border border-ruuvi-border/50">
+                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-red-500/50" /> X: {(tag.acceleration_x ?? 0).toFixed(2)}</span>
+                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-500/50" /> Y: {(tag.acceleration_y ?? 0).toFixed(2)}</span>
+                                <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-blue-500/50" /> Z: {(tag.acceleration_z ?? 0).toFixed(2)}</span>
                             </div>
-                        )}
-                        {tag.acceleration_x !== undefined && (
-                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
-                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">X-Axis</div>
-                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_x.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
-                            </div>
-                        )}
-                        {tag.acceleration_y !== undefined && (
-                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
-                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Y-Axis</div>
-                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_y.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
-                            </div>
-                        )}
-                        {tag.acceleration_z !== undefined && (
-                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
-                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Z-Axis</div>
-                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_z.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
-                            </div>
-                        )}
+                        </div>
+
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                            {tag.acceleration_total !== undefined && (
+                                <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                    <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Total Accel.</div>
+                                    <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_total.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                                </div>
+                            )}
+                            {tag.acceleration_x !== undefined && (
+                                <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                    <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">X-Axis</div>
+                                    <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_x.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                                </div>
+                            )}
+                            {tag.acceleration_y !== undefined && (
+                                <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                    <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Y-Axis</div>
+                                    <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_y.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                                </div>
+                            )}
+                            {tag.acceleration_z !== undefined && (
+                                <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                    <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Z-Axis</div>
+                                    <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_z.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

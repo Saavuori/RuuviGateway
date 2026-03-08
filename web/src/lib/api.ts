@@ -1,6 +1,6 @@
 import { Config, Tag, SystemStatus } from '../types';
 
-const MOCK_CONFIG: Config = {
+let MOCK_CONFIG: Config = {
     gw_mac: "00:00:00:00:00:00",
     all_advertisements: false,
     hci_index: 0,
@@ -13,7 +13,7 @@ const MOCK_CONFIG: Config = {
         send_decoded: false,
     },
     mqtt_publisher: {
-        enabled: true,
+        enabled: false,
         broker_url: "tcp://localhost:1883",
         client_id: "ruuvi-bridge",
         topic_prefix: "ruuvi_measurements",
@@ -41,6 +41,18 @@ const MOCK_TAGS: Tag[] = [
         pressure: 1013.25,
         battery_voltage: 2.9,
         movement_counter: 42,
+        measurement_sequence_number: 1542,
+        acceleration_x: 0.012,
+        acceleration_y: -0.004,
+        acceleration_z: 1.015,
+        acceleration_total: 1.015,
+        acceleration_angle_from_x: 89.1,
+        acceleration_angle_from_y: 90.2,
+        acceleration_angle_from_z: 1.5,
+        dew_point: 11.5,
+        absolute_humidity: 10.2,
+        air_density: 1.185,
+        equilibrium_vapor_pressure: 13.5,
         last_seen: Date.now(),
     },
     {
@@ -52,6 +64,11 @@ const MOCK_TAGS: Tag[] = [
         pressure: 1000.00,
         battery_voltage: 3.0,
         movement_counter: 127,
+        measurement_sequence_number: 88,
+        acceleration_x: -0.5,
+        acceleration_y: 0.5,
+        acceleration_z: 0.7,
+        acceleration_total: 0.994,
         last_seen: Date.now() - 5000,
     },
     {
@@ -76,6 +93,10 @@ const MOCK_TAGS: Tag[] = [
         sound_average: 38.2,
         sound_peak: 58.0,
         air_quality_index: 78,
+        // New diagnostic fields
+        calibration_in_progress: false,
+        button_pressed_on_boot: true,
+        rtc_on_boot: false,
         last_seen: Date.now() - 1000,
     },
     {
@@ -87,6 +108,7 @@ const MOCK_TAGS: Tag[] = [
         pressure: 1012.0,
         battery_voltage: 3.1,
         movement_counter: 15,
+        calibration_in_progress: true,
         last_seen: Date.now() - 2000,
     },
 ];
@@ -97,13 +119,41 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 let mockEnabledTags: string[] = [];
 let mockTagNames: Record<string, string> = {};
 
+// Simulate motion in dev mode
+if (IS_DEV) {
+    setInterval(() => {
+        MOCK_TAGS.forEach(tag => {
+            // Only update tags that likely have accelerometers
+            if (tag.mac !== "AQ:12:34:56:78:9A") {
+                const x = tag.acceleration_x ?? 0;
+                const y = tag.acceleration_y ?? 0;
+                const z = tag.acceleration_z ?? 1;
+
+                // Random jitter
+                tag.acceleration_x = x + (Math.random() - 0.5) * 0.2;
+                tag.acceleration_y = y + (Math.random() - 0.5) * 0.2;
+                tag.acceleration_z = z + (Math.random() - 0.5) * 0.1;
+
+                // Simple gravity normalization (keep it near 1G)
+                const total = Math.sqrt(tag.acceleration_x ** 2 + tag.acceleration_y ** 2 + tag.acceleration_z ** 2);
+                tag.acceleration_x /= total;
+                tag.acceleration_y /= total;
+                tag.acceleration_z /= total;
+                tag.acceleration_total = 1.0;
+                
+                tag.last_seen = Date.now();
+            }
+        });
+    }, 3000);
+}
+
 export async function fetchConfig(): Promise<Config> {
     if (IS_DEV) {
         // Include live mock state in the config
         return {
             ...MOCK_CONFIG,
-            tag_names: { ...mockTagNames },
-            enabled_tags: [...mockEnabledTags]
+            tag_names: { ...mockTagNames, ...MOCK_CONFIG.tag_names },
+            enabled_tags: Array.from(new Set([...mockEnabledTags, ...(MOCK_CONFIG.enabled_tags || [])]))
         };
     }
     const res = await fetch('/api/config');
@@ -114,6 +164,7 @@ export async function fetchConfig(): Promise<Config> {
 export async function updateConfig(config: Config): Promise<void> {
     if (IS_DEV) {
         console.log("Mock update config:", config);
+        MOCK_CONFIG = { ...config };
         return;
     }
     const res = await fetch('/api/config', {
@@ -201,10 +252,10 @@ export async function fetchStatus(): Promise<SystemStatus> {
         return {
             sinks: {
                 influxdb: {
-                    is_failing: true,
-                    buffer_size: 1420,
+                    is_failing: MOCK_CONFIG.influxdb_publisher?.enabled || false,
+                    buffer_size: MOCK_CONFIG.influxdb_publisher?.enabled ? 1420 : 0,
                     dropped: 0,
-                    failing_since: new Date(Date.now() - 1000 * 60 * 5).toISOString()
+                    failing_since: MOCK_CONFIG.influxdb_publisher?.enabled ? new Date(Date.now() - 1000 * 60 * 5).toISOString() : undefined
                 }
             }
         };

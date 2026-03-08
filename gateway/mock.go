@@ -39,6 +39,7 @@ type MockTag struct {
 	Pressure    int
 	Voltage     int
 	Sequence    uint16
+	Format      int
 }
 
 func (t *MockTag) Update() {
@@ -61,6 +62,34 @@ func (t *MockTag) Update() {
 	if t.Humidity > 99 {
 		t.Humidity = 99
 	}
+}
+
+func (t *MockTag) Generate() []byte {
+	if t.Format == 6 {
+		return t.GenerateFormat6()
+	}
+	return t.GenerateFormat5()
+}
+
+func (t *MockTag) GenerateFormat6() []byte {
+	buf := make([]byte, 26) // Format 6 is shorter in reality but we use the same size for simplicity in mock
+	buf[0] = 0x99
+	buf[1] = 0x04
+	buf[2] = 0x06 // Format 6
+
+	// Mock values for Format 6 (Ruuvi Air)
+	temp := int16(t.Temperature / 0.005)
+	binary.BigEndian.PutUint16(buf[3:], uint16(temp))
+
+	hum := uint16(t.Humidity / 0.0025)
+	binary.BigEndian.PutUint16(buf[5:], hum)
+
+	// Additional Air Quality fields (hardcoded/randomized)
+	binary.BigEndian.PutUint16(buf[7:], uint16(400+rand.Intn(100))) // CO2
+	buf[9] = byte(50 + rand.Intn(50))                              // VOC
+	buf[10] = byte(5 + rand.Intn(10))                              // NOX
+
+	return buf
 }
 
 func (t *MockTag) GenerateFormat5() []byte {
@@ -120,6 +149,14 @@ func MockScan(onAdv func(ble.Advertisement)) {
 			Pressure:    101300,
 			Voltage:     3000,
 			Sequence:    0,
+			Format:      5,
+		},
+		{
+			MAC:         "AQ:12:34:56:78:9A", // Ruuvi Air
+			Temperature: 22.0,
+			Humidity:    50.0,
+			Pressure:    101300,
+			Format:      6,
 		},
 		{
 			MAC:         "11:22:33:44:55:66", // Outdoor/Sauna
@@ -128,6 +165,7 @@ func MockScan(onAdv func(ble.Advertisement)) {
 			Pressure:    100000,
 			Voltage:     2800,
 			Sequence:    1000,
+			Format:      5,
 		},
 		{
 			MAC:         "CC:DD:EE:FF:11:22", // Living Room
@@ -136,21 +174,14 @@ func MockScan(onAdv func(ble.Advertisement)) {
 			Pressure:    101200,
 			Voltage:     3100,
 			Sequence:    500,
-		},
-		{
-			MAC:         "33:44:55:66:77:88", // Kitchen
-			Temperature: 21.0,
-			Humidity:    40.0,
-			Pressure:    101400,
-			Voltage:     2950,
-			Sequence:    200,
+			Format:      5,
 		},
 	}
 
 	for range ticker.C {
 		for _, tag := range tags {
 			tag.Update()
-			data := tag.GenerateFormat5()
+			data := tag.Generate()
 
 			adv := MockAdvertisement{
 				addr: ble.NewAddr(tag.MAC),
