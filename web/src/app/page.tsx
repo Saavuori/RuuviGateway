@@ -100,16 +100,18 @@ export default function Home() {
     }
   };
 
-  const handleExportConfig = async () => {
+  const handleExportConfig = () => {
+    if (!config) {
+      alert('Configuration is not loaded yet.');
+      return;
+    }
     try {
-      const configData = await fetchConfig();
-      const jsonString = JSON.stringify(configData, null, 2);
+      const jsonString = JSON.stringify(config, null, 2);
       
       const dateString = new Date().toISOString().split('T')[0];
       const fileName = `ruuvi-gateway-config-${dateString}.json`;
       
-      // Use octet-stream to force the browser to download rather than display
-      const blob = new Blob([jsonString], { type: 'application/octet-stream' });
+      const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
@@ -120,10 +122,9 @@ export default function Home() {
       document.body.appendChild(a);
       a.click();
       
-      document.body.removeChild(a);
-      
-      // Delay revocation so the browser has time to start the download
+      // Clean up async to ensure the browser registers the click
       setTimeout(() => {
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }, 1000);
     } catch (error) {
