@@ -108,15 +108,24 @@ export default function Home() {
       const dateString = new Date().toISOString().split('T')[0];
       const fileName = `ruuvi-gateway-config-${dateString}.json`;
       
-      // Use Data URI instead of Blob to ensure the download attribute filename is respected
-      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonString)}`;
+      // Use octet-stream to force the browser to download rather than display
+      const blob = new Blob([jsonString], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
-      a.setAttribute('href', dataUri);
-      a.setAttribute('download', fileName);
+      a.style.display = 'none';
+      a.href = url;
+      a.download = fileName;
+      
       document.body.appendChild(a);
       a.click();
+      
       document.body.removeChild(a);
+      
+      // Delay revocation so the browser has time to start the download
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
     } catch (error) {
       console.error('Failed to export config:', error);
       alert('Failed to export config. Please try again.');
