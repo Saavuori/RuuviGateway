@@ -1,7 +1,7 @@
 package gateway
 
 import (
-	"encoding/hex"
+	"encoding/binary"
 	"log"
 	"math/rand"
 	"net"
