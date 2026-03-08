@@ -63,7 +63,7 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
             {/* Current Readings */}
             <div className="border-t border-ruuvi-border pt-4">
                 <h4 className="text-sm font-bold text-ruuvi-text mb-3">Current Readings</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                     <div className="p-3 bg-ruuvi-input-bg rounded-lg border border-ruuvi-border transition-colors duration-250">
                         <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Temperature</div>
                         <div className="flex items-baseline gap-1">
@@ -97,13 +97,79 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
                 </div>
             </div>
 
+            {/* Advanced Environmental (Calculated) */}
+            {(tag.dew_point !== undefined || tag.absolute_humidity !== undefined || tag.air_density !== undefined) && (
+                <div className="border-t border-ruuvi-border pt-4">
+                    <h4 className="text-sm font-bold text-ruuvi-text mb-3">Secondary Environment</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                        {tag.dew_point !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Dew Point</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.dew_point.toFixed(2)} <span className="text-xs font-normal text-ruuvi-text-muted">°C</span></div>
+                            </div>
+                        )}
+                        {tag.absolute_humidity !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Abs. Humidity</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.absolute_humidity.toFixed(2)} <span className="text-xs font-normal text-ruuvi-text-muted">g/m³</span></div>
+                            </div>
+                        )}
+                        {tag.air_density !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Air Density</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.air_density.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">kg/m³</span></div>
+                            </div>
+                        )}
+                        {tag.equilibrium_vapor_pressure !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Vapor Pres.</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{(tag.equilibrium_vapor_pressure / 100).toFixed(2)} <span className="text-xs font-normal text-ruuvi-text-muted">hPa</span></div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* Acceleration */}
+            {(tag.acceleration_x !== undefined || tag.acceleration_total !== undefined) && (
+                <div className="border-t border-ruuvi-border pt-4">
+                    <h4 className="text-sm font-bold text-ruuvi-text mb-3">Motion & Acceleration</h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                        {tag.acceleration_total !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Total Accel.</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_total.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                            </div>
+                        )}
+                        {tag.acceleration_x !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">X-Axis</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_x.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                            </div>
+                        )}
+                        {tag.acceleration_y !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Y-Axis</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_y.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                            </div>
+                        )}
+                        {tag.acceleration_z !== undefined && (
+                            <div className="p-3 bg-ruuvi-input-bg/50 rounded-lg border border-ruuvi-border">
+                                <div className="text-ruuvi-text-muted text-xs uppercase tracking-wide">Z-Axis</div>
+                                <div className="text-lg font-bold text-ruuvi-text">{tag.acceleration_z.toFixed(3)} <span className="text-xs font-normal text-ruuvi-text-muted">G</span></div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Air Quality Readings (Data Format 6) */}
             {tag.data_format === 6 && (
                 <div className="border-t border-ruuvi-border pt-4">
                     <h4 className="text-sm font-bold text-ruuvi-text mb-3">Air Quality Readings</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
                         {tag.air_quality_index !== undefined && (
-                            <div className="p-3 bg-ruuvi-input-bg rounded-lg border border-ruuvi-success/30 col-span-2 transition-colors duration-250">
+                            <div className="p-3 bg-ruuvi-input-bg rounded-lg border border-ruuvi-success/30 col-span-full transition-colors duration-250">
                                 <div className="text-ruuvi-success text-xs uppercase tracking-wide font-bold">Air Quality Index</div>
                                 <div className="flex items-baseline gap-2">
                                     <span className="text-3xl font-bold text-ruuvi-text">
@@ -173,8 +239,8 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
 
             {/* Additional Details */}
             <div className="border-t border-ruuvi-border pt-4">
-                <h4 className="text-sm font-bold text-ruuvi-text mb-3">Diagnostics</h4>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <h4 className="text-sm font-bold text-ruuvi-text mb-3">Diagnostics & Device</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
                     <div className="space-y-1">
                         <div className="text-ruuvi-text-muted">Signal (RSSI)</div>
                         <div className="font-medium text-ruuvi-text">{tag.rssi} dBm</div>
@@ -187,10 +253,28 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
                         <div className="text-ruuvi-text-muted">Movement</div>
                         <div className="font-medium text-ruuvi-text">{tag.movement_counter ?? '--'}</div>
                     </div>
-                    <div className="space-y-1 col-span-2">
+                    <div className="space-y-1">
+                        <div className="text-ruuvi-text-muted">Seq. Number</div>
+                        <div className="font-medium text-ruuvi-text">{tag.measurement_sequence_number ?? '--'}</div>
+                    </div>
+                    {tag.calibration_in_progress !== undefined && (
+                        <div className="space-y-1">
+                            <div className="text-ruuvi-text-muted">Calibrating</div>
+                            <div className={`font-medium ${tag.calibration_in_progress ? 'text-ruuvi-success' : 'text-ruuvi-text'}`}>
+                                {tag.calibration_in_progress ? 'In Progress' : 'No'}
+                            </div>
+                        </div>
+                    )}
+                    {tag.button_pressed_on_boot !== undefined && (
+                        <div className="space-y-1">
+                            <div className="text-ruuvi-text-muted">Boot Button</div>
+                            <div className="font-medium text-ruuvi-text">{tag.button_pressed_on_boot ? 'Pressed' : 'No'}</div>
+                        </div>
+                    )}
+                    <div className="space-y-1 col-span-full">
                         <div className="text-ruuvi-text-muted">Last Seen</div>
                         <div className="font-medium text-ruuvi-text">
-                            {new Date(tag.last_seen * 1000).toLocaleString()}
+                            {new Date(tag.last_seen).toLocaleString()}
                         </div>
                     </div>
                 </div>

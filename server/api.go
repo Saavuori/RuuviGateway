@@ -44,7 +44,21 @@ type Tag struct {
 	SoundPeak         *float64 `json:"sound_peak,omitempty"`
 	AccelerationTotal *float64 `json:"acceleration_total,omitempty"`
 	AirQualityIndex   *float64 `json:"air_quality_index,omitempty"`
-	LastSeen          int64    `json:"last_seen"` // Unix timestamp in ms
+	// Additional fields added
+	AccelerationX             *float64 `json:"acceleration_x,omitempty"`
+	AccelerationY             *float64 `json:"acceleration_y,omitempty"`
+	AccelerationZ             *float64 `json:"acceleration_z,omitempty"`
+	CalibrationInProgress     *bool    `json:"calibration_in_progress,omitempty"`
+	ButtonPressedOnBoot       *bool    `json:"button_pressed_on_boot,omitempty"`
+	RtcOnBoot                 *bool    `json:"rtc_on_boot,omitempty"`
+	AbsoluteHumidity          *float64 `json:"absolute_humidity,omitempty"`
+	DewPoint                  *float64 `json:"dew_point,omitempty"`
+	EquilibriumVaporPressure *float64 `json:"equilibrium_vapor_pressure,omitempty"`
+	AirDensity                *float64 `json:"air_density,omitempty"`
+	AccelerationAngleFromX    *float64 `json:"acceleration_angle_from_x,omitempty"`
+	AccelerationAngleFromY    *float64 `json:"acceleration_angle_from_y,omitempty"`
+	AccelerationAngleFromZ    *float64 `json:"acceleration_angle_from_z,omitempty"`
+	LastSeen                  int64    `json:"last_seen"` // Unix timestamp in ms
 }
 
 var (
@@ -90,8 +104,23 @@ func UpdateTag(m parser.Measurement) {
 	tags.SoundAverage = m.SoundAverage
 	tags.SoundPeak = m.SoundPeak
 
+	// Acceleration and other fields
+	tags.AccelerationX = m.AccelerationX
+	tags.AccelerationY = m.AccelerationY
+	tags.AccelerationZ = m.AccelerationZ
+	tags.CalibrationInProgress = m.CalibrationInProgress
+	tags.ButtonPressedOnBoot = m.ButtonPressedOnBoot
+	tags.RtcOnBoot = m.RtcOnBoot
+
 	// Calculated fields
 	tags.AccelerationTotal = m.AccelerationTotal
+	tags.AbsoluteHumidity = m.AbsoluteHumidity
+	tags.DewPoint = m.DewPoint
+	tags.EquilibriumVaporPressure = m.EquilibriumVaporPressure
+	tags.AirDensity = m.AirDensity
+	tags.AccelerationAngleFromX = m.AccelerationAngleFromX
+	tags.AccelerationAngleFromY = m.AccelerationAngleFromY
+	tags.AccelerationAngleFromZ = m.AccelerationAngleFromZ
 
 	tags.LastSeen = time.Now().UnixMilli()
 	recentTags[m.Mac] = tags

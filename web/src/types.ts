@@ -96,6 +96,21 @@ export interface Tag {
     sound_average?: number;
     sound_peak?: number;
     air_quality_index?: number;
+    // Additional fields from backend
+    acceleration_x?: number;
+    acceleration_y?: number;
+    acceleration_z?: number;
+    calibration_in_progress?: boolean;
+    button_pressed_on_boot?: boolean;
+    rtc_on_boot?: boolean;
+    absolute_humidity?: number;
+    dew_point?: number;
+    equilibrium_vapor_pressure?: number;
+    air_density?: number;
+    acceleration_total?: number;
+    acceleration_angle_from_x?: number;
+    acceleration_angle_from_y?: number;
+    acceleration_angle_from_z?: number;
     last_seen: number; // Unix timestamp
 }
 
