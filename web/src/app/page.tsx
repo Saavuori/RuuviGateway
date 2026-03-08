@@ -315,7 +315,7 @@ export default function Home() {
               <p className="text-ruuvi-text-muted mt-1">Nearby RuuviTags detected by the scanner</p>
             </div>
 
-            <div className="flex flex-wrap gap-6 justify-center">
+            <div className="flex flex-wrap gap-4 justify-center">
               {tags
                 .sort((a, b) => a.mac.localeCompare(b.mac))
                 .map((tag) => (
@@ -373,7 +373,7 @@ export default function Home() {
               <p className="text-ruuvi-text-muted mt-1">Configure where tag data is forwarded</p>
             </div>
 
-            <div className="flex flex-wrap gap-6 justify-center">
+            <div className="flex flex-wrap gap-4 justify-center">
               {sinks.map((sink) => (
                 <IntegrationCard
                   key={sink.id}

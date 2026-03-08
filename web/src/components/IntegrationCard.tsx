@@ -64,7 +64,7 @@ export function IntegrationCard({
     }
 
     return (
-        <div className="bg-ruuvi-card rounded-xl shadow-lg border border-ruuvi-border p-4 flex flex-col h-auto hover:shadow-xl transition-shadow relative overflow-hidden w-72 transition-colors duration-250">
+        <div className="bg-ruuvi-card rounded-xl shadow-lg border border-ruuvi-border p-4 flex flex-col h-auto hover:shadow-xl transition-shadow relative overflow-hidden w-56 transition-colors duration-250">
             {/* Header: Bluetooth icon + (Name / MAC stack) */}
             <div className="flex items-start gap-3 mb-3 z-10 relative">
                 <div className="p-2 bg-ruuvi-input-bg rounded-full shrink-0 mt-0.5">

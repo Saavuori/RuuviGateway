@@ -1,9 +1,10 @@
 package gateway
 
 import (
-	"encoding/binary"
+	"encoding/hex"
 	"log"
 	"math/rand"
+	"net"
 	"time"
 
 	"github.com/rigado/ble"
@@ -97,16 +98,9 @@ func (t *MockTag) GenerateFormat5() []byte {
 	binary.BigEndian.PutUint16(buf[18:], t.Sequence)
 
 	// MAC (last 6 bytes)
-	// For simplicity, we are not parsing the string MAC here, just hardcoding consistent bytes based on the MAC string for now
-	// In a real implementation we should parse t.MAC.
-	// But since we are mocking, let's just make the payload consistent with the MAC used in the advertisement logic.
-	// This MockTag struct holds the MAC string which is used for ble.NewAddr().
-	// To put it in the payload, we need to decode it.
-	// Let's do a quick hack for the two known mock tags:
-	if t.MAC == "AA:BB:CC:DD:EE:FF" {
-		copy(buf[20:], []byte{0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF})
-	} else if t.MAC == "11:22:33:44:55:66" {
-		copy(buf[20:], []byte{0x11, 0x22, 0x33, 0x44, 0x55, 0x66})
+	parsedMac, err := net.ParseMAC(t.MAC)
+	if err == nil {
+		copy(buf[20:], parsedMac)
 	}
 
 	return buf
@@ -134,6 +128,22 @@ func MockScan(onAdv func(ble.Advertisement)) {
 			Pressure:    100000,
 			Voltage:     2800,
 			Sequence:    1000,
+		},
+		{
+			MAC:         "CC:DD:EE:FF:11:22", // Living Room
+			Temperature: 22.5,
+			Humidity:    35.0,
+			Pressure:    101200,
+			Voltage:     3100,
+			Sequence:    500,
+		},
+		{
+			MAC:         "33:44:55:66:77:88", // Kitchen
+			Temperature: 21.0,
+			Humidity:    40.0,
+			Pressure:    101400,
+			Voltage:     2950,
+			Sequence:    200,
 		},
 	}
 

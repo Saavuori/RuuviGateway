@@ -78,6 +78,17 @@ const MOCK_TAGS: Tag[] = [
         air_quality_index: 78,
         last_seen: Date.now() - 1000,
     },
+    {
+        mac: "CC:DD:EE:FF:11:22",
+        rssi: -60,
+        data_format: 5,
+        temperature: 22.5,
+        humidity: 35.0,
+        pressure: 1012.0,
+        battery_voltage: 3.1,
+        movement_counter: 15,
+        last_seen: Date.now() - 2000,
+    },
 ];
 
 const IS_DEV = process.env.NODE_ENV === 'development';
