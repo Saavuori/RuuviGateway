@@ -28,6 +28,10 @@ let MOCK_CONFIG: Config = {
         bucket: "bucket",
         measurement: "measurements",
         minimum_interval: "1s",
+        buffer: {
+            max_size: 10000,
+            retry_interval: "5s"
+        }
     },
 };
 

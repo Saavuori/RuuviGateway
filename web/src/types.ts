@@ -54,6 +54,7 @@ export interface InfluxDBPublisherConfig {
     bucket: string;
     measurement: string;
     minimum_interval: string;
+    buffer?: BufferConfig;
 }
 
 export interface InfluxDB3PublisherConfig {
@@ -63,6 +64,12 @@ export interface InfluxDB3PublisherConfig {
     database: string;
     measurement: string;
     minimum_interval: string;
+    buffer?: BufferConfig;
+}
+
+export interface BufferConfig {
+    max_size: number;
+    retry_interval: string;
 }
 
 export interface PrometheusConfig {

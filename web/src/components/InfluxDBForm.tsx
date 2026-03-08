@@ -22,6 +22,17 @@ export function InfluxDBForm({ initialConfig, onChange }: InfluxDBFormProps) {
         onChange({ ...config, [field]: value });
     };
 
+    const handleBufferChange = (field: keyof NonNullable<InfluxDBPublisherConfig['buffer']>, value: any) => {
+        const currentBuffer = config.buffer || { max_size: 10000, retry_interval: '5s' };
+        onChange({
+            ...config,
+            buffer: {
+                ...currentBuffer,
+                [field]: value
+            }
+        });
+    };
+
     const inputClasses = "w-full px-3 py-2 bg-ruuvi-input-bg border border-ruuvi-border rounded-lg focus:ring-2 focus:ring-ruuvi-success/50 focus:border-ruuvi-success text-sm text-ruuvi-text placeholder-ruuvi-text-muted/30 transition-colors duration-250";
     const labelClasses = "text-sm font-medium text-ruuvi-text-muted";
 
@@ -101,6 +112,32 @@ export function InfluxDBForm({ initialConfig, onChange }: InfluxDBFormProps) {
                         className={inputClasses}
                     />
                     <p className="text-xs text-ruuvi-text-muted/70">e.g., 1s, 500ms</p>
+                </div>
+            </div>
+
+            <div className="pt-2 border-t border-ruuvi-border/50">
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label className={labelClasses}>Buffer Max Size</label>
+                        <input
+                            type="number"
+                            value={config.buffer?.max_size ?? 10000}
+                            onChange={(e) => handleBufferChange('max_size', parseInt(e.target.value) || 0)}
+                            className={inputClasses}
+                        />
+                        <p className="text-xs text-ruuvi-text-muted/70">Measurements to keep offline</p>
+                    </div>
+                    <div className="space-y-1">
+                        <label className={labelClasses}>Retry Interval</label>
+                        <input
+                            type="text"
+                            value={config.buffer?.retry_interval ?? '5s'}
+                            onChange={(e) => handleBufferChange('retry_interval', e.target.value)}
+                            placeholder="5s"
+                            className={inputClasses}
+                        />
+                        <p className="text-xs text-ruuvi-text-muted/70">e.g., 5s, 10s</p>
+                    </div>
                 </div>
             </div>
         </div>
