@@ -98,3 +98,14 @@ export interface Tag {
     air_quality_index?: number;
     last_seen: number; // Unix timestamp
 }
+
+export interface SinkStatus {
+    is_failing: boolean;
+    buffer_size: number;
+    dropped: number;
+    failing_since?: string;
+}
+
+export interface SystemStatus {
+    sinks: Record<string, SinkStatus>;
+}

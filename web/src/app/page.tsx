@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchConfig, fetchTags, updateConfig, enableTag, restartGateway, setTagName, fetchVersion } from '@/lib/api';
-import { Config, Tag, MQTTPublisherConfig, InfluxDBPublisherConfig, InfluxDB3PublisherConfig } from '@/types';
+import { fetchConfig, fetchTags, updateConfig, enableTag, restartGateway, setTagName, fetchVersion, fetchStatus } from '@/lib/api';
+import { Config, Tag, MQTTPublisherConfig, InfluxDBPublisherConfig, InfluxDB3PublisherConfig, SystemStatus } from '@/types';
 import { IntegrationCard } from '@/components/IntegrationCard';
 import { Modal } from '@/components/Modal';
 import { MQTTForm } from '@/components/MQTTForm';
@@ -17,6 +17,7 @@ export default function Home() {
   const [config, setConfig] = useState<Config | null>(null);
   const [tags, setTags] = useState<Tag[]>([]);
   const [version, setVersion] = useState<string>("Unknown");
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'configuration'>('dashboard');
 
@@ -42,14 +43,16 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [configData, tagsData, versionData] = await Promise.all([
+        const [configData, tagsData, versionData, statusData] = await Promise.all([
           fetchConfig(),
           fetchTags(),
-          fetchVersion()
+          fetchVersion(),
+          fetchStatus()
         ]);
         setConfig(configData);
         setTags(tagsData);
         setVersion(versionData.version);
+        setSystemStatus(statusData);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       } finally {
@@ -61,10 +64,11 @@ export default function Home() {
 
     const interval = setInterval(async () => {
       try {
-        const tagsData = await fetchTags();
+        const [tagsData, statusData] = await Promise.all([fetchTags(), fetchStatus()]);
         setTags(tagsData);
+        setSystemStatus(statusData);
       } catch (error) {
-        console.error('Error polling tags:', error);
+        console.error('Error polling data:', error);
       }
     }, 2500);
 
@@ -376,6 +380,38 @@ export default function Home() {
       </header>
 
       <main className="mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+        {/* Buffering Indicator Alerts */}
+        {systemStatus && Object.entries(systemStatus.sinks).map(([name, status]) => {
+          if (!status.is_failing || status.buffer_size === 0) return null;
+          
+          let durationStr = "recently";
+          if (status.failing_since) {
+            const diffMs = Date.now() - new Date(status.failing_since).getTime();
+            const mins = Math.floor(diffMs / 60000);
+            if (mins > 0) {
+              if (mins > 60) {
+                durationStr = `for ${Math.floor(mins / 60)} hours and ${mins % 60} mins`;
+              } else {
+                durationStr = `for ${mins} mins`;
+              }
+            }
+          }
+
+          return (
+            <div key={name} className="flex items-center justify-between p-4 mb-4 rounded-xl bg-red-900/40 border border-red-500/50 shadow-sm animate-pulse">
+              <div className="flex items-center gap-3 text-red-100">
+                <LayoutDashboard className="w-5 h-5 text-red-500" />
+                <div>
+                  <h3 className="font-bold text-red-300 capitalize">{name} Connection Error</h3>
+                  <p className="text-sm">
+                    Disconnected {durationStr}. Buffering {status.buffer_size} measurements to retry later.
+                    {status.dropped > 0 && ` (${status.dropped} oldest measurements dropped due to full buffer).`}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
 
         {/* === Dashboard Tab === */}
         {activeTab === 'dashboard' && (

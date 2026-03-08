@@ -12,6 +12,7 @@ import (
 
 	"github.com/Saavuori/RuuviGateway/common/version"
 	"github.com/Saavuori/RuuviGateway/config"
+	"github.com/Saavuori/RuuviGateway/data_sinks"
 	"github.com/Saavuori/RuuviGateway/parser"
 	"github.com/Saavuori/RuuviGateway/web"
 	log "github.com/sirupsen/logrus"
@@ -111,6 +112,7 @@ func Start(conf config.Config, confFile string, onConfigChange func(config.Confi
 	mux.HandleFunc("/api/tags/name", handleTagName)
 	mux.HandleFunc("/api/version", handleVersion)
 	mux.HandleFunc("/api/restart", handleRestart)
+	mux.HandleFunc("/api/status", handleStatus)
 
 	// Static Files (Web UI)
 	fsys, err := fs.Sub(web.Assets, "out")
@@ -357,5 +359,19 @@ func handleVersion(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"version": version.Version,
+	})
+}
+
+func handleStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	statuses := data_sinks.GetBufferStatuses()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"sinks": statuses,
 	})
 }

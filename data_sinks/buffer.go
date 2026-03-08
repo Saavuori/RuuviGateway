@@ -20,6 +20,41 @@ type BufferConfig struct {
 	RetryInterval time.Duration `yaml:"retry_interval" json:"retry_interval"`
 }
 
+// BufferStatus represents the current state of a retry buffer
+type BufferStatus struct {
+	IsFailing    bool      `json:"is_failing"`
+	BufferSize   int       `json:"buffer_size"`
+	Dropped      int64     `json:"dropped"`
+	FailingSince time.Time `json:"failing_since"`
+}
+
+var (
+	activeBuffers = make(map[string]*BufferedWriter)
+	buffersMu     sync.RWMutex
+)
+
+// GetBufferStatuses returns the current status of all registered buffers
+func GetBufferStatuses() map[string]BufferStatus {
+	buffersMu.RLock()
+	defer buffersMu.RUnlock()
+
+	statuses := make(map[string]BufferStatus)
+	for name, bw := range activeBuffers {
+		bw.mu.Lock()
+		status := BufferStatus{
+			IsFailing:  !bw.firstError.IsZero(),
+			BufferSize: len(bw.buffer),
+			Dropped:    bw.totalDropped,
+		}
+		if status.IsFailing {
+			status.FailingSince = bw.firstError
+		}
+		bw.mu.Unlock()
+		statuses[name] = status
+	}
+	return statuses
+}
+
 // BufferedPoint is a generic container for a data point that needs to be written.
 // The sink-specific code serializes into this before handing off to the buffer.
 type BufferedPoint struct {
@@ -41,6 +76,7 @@ type BufferedWriter struct {
 	sinkName      string
 	retryInterval time.Duration
 	totalDropped  int64
+	firstError    time.Time
 	stopCh        chan struct{}
 }
 
@@ -75,6 +111,10 @@ func NewBufferedWriter(sinkName string, conf *BufferConfig, writeFn WriteFn) *Bu
 		"retry_interval": retryInterval,
 	}).Info("Started buffered writer")
 
+	buffersMu.Lock()
+	activeBuffers[sinkName] = bw
+	buffersMu.Unlock()
+
 	return bw
 }
 
@@ -83,12 +123,22 @@ func NewBufferedWriter(sinkName string, conf *BufferConfig, writeFn WriteFn) *Bu
 func (bw *BufferedWriter) Write(point BufferedPoint) {
 	err := bw.writeFn(point)
 	if err != nil {
+		bw.mu.Lock()
+		if bw.firstError.IsZero() {
+			bw.firstError = time.Now()
+		}
+		bw.mu.Unlock()
+
 		bw.addToBuffer(point)
 		log.WithFields(log.Fields{
 			"sink":        bw.sinkName,
 			"buffer_size": bw.BufferSize(),
 			"error":       err,
 		}).Warn("Write failed, point buffered for retry")
+	} else {
+		bw.mu.Lock()
+		bw.firstError = time.Time{}
+		bw.mu.Unlock()
 	}
 }
 
@@ -102,6 +152,10 @@ func (bw *BufferedWriter) BufferSize() int {
 // Stop shuts down the retry goroutine.
 func (bw *BufferedWriter) Stop() {
 	close(bw.stopCh)
+	
+	buffersMu.Lock()
+	delete(activeBuffers, bw.sinkName)
+	buffersMu.Unlock()
 }
 
 func (bw *BufferedWriter) addToBuffer(point BufferedPoint) {
@@ -197,6 +251,7 @@ func (bw *BufferedWriter) flushBuffer() bool {
 	// All flushed successfully
 	bw.mu.Lock()
 	bw.buffer = bw.buffer[flushed:]
+	bw.firstError = time.Time{}
 	bw.mu.Unlock()
 	return true
 }

@@ -1,4 +1,4 @@
-import { Config, Tag } from '../types';
+import { Config, Tag, SystemStatus } from '../types';
 
 const MOCK_CONFIG: Config = {
     gw_mac: "00:00:00:00:00:00",
@@ -195,3 +195,22 @@ export async function fetchVersion(): Promise<{ version: string }> {
     if (!res.ok) throw new Error('Failed to fetch version');
     return res.json();
 }
+
+export async function fetchStatus(): Promise<SystemStatus> {
+    if (IS_DEV) {
+        return {
+            sinks: {
+                influxdb: {
+                    is_failing: true,
+                    buffer_size: 1420,
+                    dropped: 0,
+                    failing_since: new Date(Date.now() - 1000 * 60 * 5).toISOString()
+                }
+            }
+        };
+    }
+    const res = await fetch('/api/status');
+    if (!res.ok) throw new Error('Failed to fetch status');
+    return res.json();
+}
+
