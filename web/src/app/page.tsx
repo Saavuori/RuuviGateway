@@ -104,17 +104,19 @@ export default function Home() {
     try {
       const configData = await fetchConfig();
       const jsonString = JSON.stringify(configData, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
       
       const dateString = new Date().toISOString().split('T')[0];
+      const fileName = `ruuvi-gateway-config-${dateString}.json`;
+      
+      // Use Data URI instead of Blob to ensure the download attribute filename is respected
+      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonString)}`;
+      
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `ruuvi-gateway-config-${dateString}.json`;
+      a.setAttribute('href', dataUri);
+      a.setAttribute('download', fileName);
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Failed to export config:', error);
       alert('Failed to export config. Please try again.');
