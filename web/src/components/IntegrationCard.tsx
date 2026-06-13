@@ -1,4 +1,4 @@
-import { LucideIcon, Pencil, Thermometer, Droplets, Gauge, Signal, Battery, Sun, Activity } from 'lucide-react';
+import { LucideIcon, Pencil, Trash2, Thermometer, Droplets, Gauge, Signal, Battery, Sun, Activity } from 'lucide-react';
 
 interface IntegrationCardProps {
     title: string;
@@ -30,6 +30,7 @@ interface IntegrationCardProps {
     // Toggle props for RuuviTags
     isEnabled?: boolean;
     onToggleEnabled?: (enabled: boolean) => void;
+    onRemove?: () => void;
 }
 
 export function IntegrationCard({
@@ -45,7 +46,8 @@ export function IntegrationCard({
     subtitle,
     lastSeen,
     isEnabled,
-    onToggleEnabled
+    onToggleEnabled,
+    onRemove
 }: IntegrationCardProps) {
     const isRuuviTag = !!sensors;
     const buttonLabel = configureLabel || (status === 'new' ? 'Add' : 'Configure');
@@ -81,6 +83,19 @@ export function IntegrationCard({
                                 title="Edit tag settings"
                             >
                                 <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                        )}
+                        {/* Trash edit icon — for deleting/forgetting tag */}
+                        {isRuuviTag && onRemove && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onRemove();
+                                }}
+                                className="p-1 text-ruuvi-text-muted hover:text-red-400 hover:bg-ruuvi-input-bg rounded transition-colors shrink-0"
+                                title="Forget/Remove tag"
+                            >
+                                <Trash2 className="w-3.5 h-3.5" />
                             </button>
                         )}
                         {/* Status badge for sinks */}

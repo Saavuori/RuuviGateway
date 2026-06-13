@@ -1,4 +1,5 @@
 import { Tag } from '@/types';
+import { Trash2 } from 'lucide-react';
 
 interface RuuviTagFormProps {
     tag: Tag;
@@ -6,6 +7,7 @@ interface RuuviTagFormProps {
     enabled: boolean;
     onNameChange: (name: string) => void;
     onEnabledChange: (enabled: boolean) => void;
+    onRemove?: () => void;
 }
 
 interface Tag3DProps {
@@ -78,7 +80,7 @@ function Tag3D({ x, y, z }: Tag3DProps) {
     );
 }
 
-export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledChange }: RuuviTagFormProps) {
+export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledChange, onRemove }: RuuviTagFormProps) {
     const inputClasses = "w-full px-3 py-2 bg-ruuvi-input-bg border border-ruuvi-border rounded-lg focus:ring-2 focus:ring-ruuvi-success/50 focus:border-ruuvi-success text-sm text-ruuvi-text placeholder-ruuvi-text-muted/30 transition-colors duration-250";
     const labelClasses = "text-sm font-medium text-ruuvi-text-muted";
 
@@ -367,6 +369,29 @@ export function RuuviTagForm({ tag, tagName, enabled, onNameChange, onEnabledCha
                     </div>
                 </div>
             </div>
+
+            {/* Danger Zone */}
+            {onRemove && (
+                <div className="border-t border-red-500/20 pt-4">
+                    <h4 className="text-sm font-bold text-red-400 mb-3">Danger Zone</h4>
+                    <div className="p-4 bg-red-950/20 border border-red-500/25 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors duration-250">
+                        <div className="space-y-1">
+                            <div className="font-bold text-red-200 text-sm">Forget Tag</div>
+                            <div className="text-xs text-ruuvi-text-muted">
+                                Remove this tag from the gateway's discovered tags list. It will reappear if it is seen again.
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={onRemove}
+                            className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-semibold text-xs rounded-lg transition-colors shadow-sm flex items-center gap-1.5 shrink-0"
+                        >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Forget Tag
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

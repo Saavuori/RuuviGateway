@@ -9,8 +9,8 @@ description: how to commit and push code changes to GitHub
 Set git identity before committing if not already configured:
 
 ```powershell
-git config user.name "Sampsa Saavuori"
-git config user.email "sampsa.saavuori@gmail.com"
+git config user.name "Your Name"
+git config user.email "your.email@example.com"
 ```
 
 ## PowerShell Syntax

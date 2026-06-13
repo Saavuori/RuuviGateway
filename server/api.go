@@ -215,16 +215,80 @@ func handleConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleTags(w http.ResponseWriter, r *http.Request) {
-	tagsLock.RLock()
-	defer tagsLock.RUnlock()
+	if r.Method == http.MethodGet {
+		tagsLock.RLock()
+		defer tagsLock.RUnlock()
 
-	list := make([]Tag, 0, len(recentTags))
-	for _, t := range recentTags {
-		list = append(list, t)
+		list := make([]Tag, 0, len(recentTags))
+		for _, t := range recentTags {
+			list = append(list, t)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(list)
+	} else if r.Method == http.MethodDelete {
+		mac := r.URL.Query().Get("mac")
+		if mac == "" {
+			http.Error(w, "Missing mac parameter", http.StatusBadRequest)
+			return
+		}
+		mac = strings.ToUpper(mac)
+
+		// 1. Remove from in-memory recent tags
+		tagsLock.Lock()
+		delete(recentTags, mac)
+		tagsLock.Unlock()
+
+		// 2. Read config file
+		data, err := os.ReadFile(configFile)
+		if err == nil {
+			var c config.Config
+			if err := yaml.Unmarshal(data, &c); err == nil {
+				configChanged := false
+
+				// Remove from TagNames
+				if c.TagNames != nil {
+					if _, exists := c.TagNames[mac]; exists {
+						delete(c.TagNames, mac)
+						configChanged = true
+					}
+				}
+
+				// Remove from EnabledTags
+				if len(c.EnabledTags) > 0 {
+					newList := make([]string, 0, len(c.EnabledTags))
+					for _, m := range c.EnabledTags {
+						if !strings.EqualFold(m, mac) {
+							newList = append(newList, m)
+						} else {
+							configChanged = true
+						}
+					}
+					c.EnabledTags = newList
+				}
+
+				// Save back to file and update in-memory enabled tags if changed
+				if configChanged {
+					newData, err := yaml.Marshal(c)
+					if err == nil {
+						if err := os.WriteFile(configFile, newData, 0644); err == nil {
+							UpdateEnabledTags(c.EnabledTags)
+							// Notify if onConfigChangeFn is set
+							if onConfigChangeFn != nil {
+								onConfigChangeFn(c)
+							}
+						}
+					}
+				}
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"success": true})
+	} else {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(list)
 }
 
 func handleTagEnable(w http.ResponseWriter, r *http.Request) {

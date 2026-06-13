@@ -269,3 +269,24 @@ export async function fetchStatus(): Promise<SystemStatus> {
     return res.json();
 }
 
+export async function deleteTag(mac: string): Promise<{ success: boolean }> {
+    if (IS_DEV) {
+        console.log("Mock delete tag:", mac);
+        const idx = MOCK_TAGS.findIndex(t => t.mac.toLowerCase() === mac.toLowerCase());
+        if (idx !== -1) {
+            MOCK_TAGS.splice(idx, 1);
+        }
+        mockEnabledTags = mockEnabledTags.filter(m => m.toLowerCase() !== mac.toLowerCase());
+        const upperMac = mac.toUpperCase();
+        const { [upperMac]: _, ...rest } = mockTagNames;
+        mockTagNames = rest;
+        return { success: true };
+    }
+    const res = await fetch(`/api/tags?mac=${encodeURIComponent(mac)}`, {
+        method: 'DELETE',
+    });
+    if (!res.ok) throw new Error('Failed to delete tag');
+    return res.json();
+}
+
+

@@ -7,7 +7,7 @@ import (
 )
 
 func buildFullAdvertisement(payload []byte) []byte {
-	header := []byte{0x2B, 0xFF, 0x99, 0x04}
+	header := []byte{0x02, 0x01, 0x04, 0x1B, 0xFF, 0x99, 0x04}
 	adv := make([]byte, 0, len(header)+len(payload))
 	adv = append(adv, header...)
 	adv = append(adv, payload...)

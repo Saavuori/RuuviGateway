@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchConfig, fetchTags, updateConfig, enableTag, restartGateway, setTagName, fetchVersion, fetchStatus } from '@/lib/api';
+import { fetchConfig, fetchTags, updateConfig, enableTag, restartGateway, setTagName, fetchVersion, fetchStatus, deleteTag } from '@/lib/api';
 import { Config, Tag, MQTTPublisherConfig, InfluxDBPublisherConfig, InfluxDB3PublisherConfig, SystemStatus } from '@/types';
 import { IntegrationCard } from '@/components/IntegrationCard';
 import { Modal } from '@/components/Modal';
@@ -201,6 +201,32 @@ export default function Home() {
       setSelectedTagMac(null);
     } catch (e) {
       alert('Failed to save: ' + e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRemoveTag = async (mac: string) => {
+    const tagName = getTagName(mac) || `RuuviTag ${mac.slice(-5)}`;
+    if (!confirm(`Are you sure you want to forget and remove ${tagName}?`)) return;
+
+    setIsSaving(true);
+    try {
+      await deleteTag(mac);
+      
+      // Update local state by removing the tag
+      setTags(prev => prev.filter(t => t.mac !== mac));
+      
+      // Sync configuration since we deleted tag-specific configs (name/enabled)
+      const configData = await fetchConfig();
+      setConfig(configData);
+
+      // If the editing modal was open for this tag, close it
+      if (selectedTagMac === mac) {
+        setSelectedTagMac(null);
+      }
+    } catch (e) {
+      alert('Failed to remove tag: ' + e);
     } finally {
       setIsSaving(false);
     }
@@ -460,6 +486,7 @@ export default function Home() {
                         console.error('Failed to toggle tag:', e);
                       }
                     }}
+                    onRemove={() => handleRemoveTag(tag.mac)}
                   />
                 ))}
               {tags.length === 0 && (
@@ -605,6 +632,7 @@ export default function Home() {
               enabled={tagModalEnabled}
               onNameChange={setTagModalName}
               onEnabledChange={setTagModalEnabled}
+              onRemove={() => handleRemoveTag(selectedTagMac)}
             />
           ) : null;
         })()}
