@@ -160,7 +160,7 @@ export async function fetchConfig(): Promise<Config> {
             enabled_tags: Array.from(new Set([...mockEnabledTags, ...(MOCK_CONFIG.enabled_tags || [])]))
         };
     }
-    const res = await fetch('/api/config');
+    const res = await fetch('api/config');
     if (!res.ok) throw new Error('Failed to fetch config');
     return res.json();
 }
@@ -171,7 +171,7 @@ export async function updateConfig(config: Config): Promise<void> {
         MOCK_CONFIG = { ...config };
         return;
     }
-    const res = await fetch('/api/config', {
+    const res = await fetch('api/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config),
@@ -181,7 +181,7 @@ export async function updateConfig(config: Config): Promise<void> {
 
 export async function fetchTags(): Promise<Tag[]> {
     if (IS_DEV) return MOCK_TAGS;
-    const res = await fetch('/api/tags');
+    const res = await fetch('api/tags');
     if (!res.ok) throw new Error('Failed to fetch tags');
     return res.json();
 }
@@ -200,7 +200,7 @@ export async function enableTag(mac: string, enabled: boolean): Promise<{ succes
         }
         return { success: true, enabled_tags: [...mockEnabledTags] };
     }
-    const res = await fetch('/api/tags/enable', {
+    const res = await fetch('api/tags/enable', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mac, enabled }),
@@ -214,7 +214,7 @@ export async function restartGateway(): Promise<{ restarting: boolean }> {
         console.log("Mock restart gateway");
         return { restarting: true };
     }
-    const res = await fetch('/api/restart', {
+    const res = await fetch('api/restart', {
         method: 'POST',
     });
     if (!res.ok) throw new Error('Failed to restart gateway');
@@ -235,7 +235,7 @@ export async function setTagName(mac: string, name: string): Promise<{ success: 
         }
         return { success: true, tag_names: { ...mockTagNames } };
     }
-    const res = await fetch('/api/tags/name', {
+    const res = await fetch('api/tags/name', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mac, name }),
@@ -246,7 +246,7 @@ export async function setTagName(mac: string, name: string): Promise<{ success: 
 
 export async function fetchVersion(): Promise<{ version: string }> {
     if (IS_DEV) return { version: "v0.1.0-dev" };
-    const res = await fetch('/api/version');
+    const res = await fetch('api/version');
     if (!res.ok) throw new Error('Failed to fetch version');
     return res.json();
 }
@@ -264,7 +264,7 @@ export async function fetchStatus(): Promise<SystemStatus> {
             }
         };
     }
-    const res = await fetch('/api/status');
+    const res = await fetch('api/status');
     if (!res.ok) throw new Error('Failed to fetch status');
     return res.json();
 }
@@ -282,7 +282,7 @@ export async function deleteTag(mac: string): Promise<{ success: boolean }> {
         mockTagNames = rest;
         return { success: true };
     }
-    const res = await fetch(`/api/tags?mac=${encodeURIComponent(mac)}`, {
+    const res = await fetch(`api/tags?mac=${encodeURIComponent(mac)}`, {
         method: 'DELETE',
     });
     if (!res.ok) throw new Error('Failed to delete tag');
