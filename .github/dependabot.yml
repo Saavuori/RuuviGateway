@@ -1,0 +1,100 @@
+version: 2
+
+# The Go module is at the repo root here, not under backend/, and the frontend
+# is web/ rather than frontend/ — the paths differ from the other Go repos.
+#
+# Every entry carries a 3-day cooldown: a version that gets yanked shortly
+# after publishing never reaches a PR.
+
+updates:
+  # ---- Go module (root) ----
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Helsinki
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    labels: [dependencies, go]
+    cooldown:
+      default-days: 3
+    groups:
+      go-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- Web frontend ----
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Helsinki
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      prefix-development: chore
+      include: scope
+    labels: [dependencies, frontend]
+    cooldown:
+      default-days: 3
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- Dockerfile base images ----
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Helsinki
+    commit-message:
+      prefix: chore
+      include: scope
+    labels: [dependencies, docker]
+    cooldown:
+      default-days: 3
+    groups:
+      docker-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- compose service images ----
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Helsinki
+    commit-message:
+      prefix: chore
+      include: scope
+    labels: [dependencies, docker]
+    cooldown:
+      default-days: 3
+    ignore:
+      # Our own images are pinned to :latest by design — the host pulls them, so a
+      # PR bumping a tag that never moves is pure noise.
+      - dependency-name: ghcr.io/saavuori/*
+    groups:
+      compose-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- GitHub Actions ----
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Europe/Helsinki
+    commit-message:
+      prefix: chore
+      include: scope
+    labels: [dependencies, ci]
+    cooldown:
+      default-days: 3
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
