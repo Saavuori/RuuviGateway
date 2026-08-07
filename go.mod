@@ -51,7 +51,7 @@ require (
 )
 
 require (
-	github.com/eclipse/paho.mqtt.golang v1.5.0
+	github.com/eclipse/paho.mqtt.golang v1.5.1
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/raff/goble v0.0.0-20190909174656-72afc67d6a99 // indirect
 	github.com/sirupsen/logrus v1.9.3
