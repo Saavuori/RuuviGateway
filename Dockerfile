@@ -9,7 +9,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Stage 2: Build the backend and embed frontend
-FROM golang:1.23-alpine AS backend-builder
+# Must be >= the `go` directive in go.mod. Raised to 1.25 with the x/crypto
+# security bump: golang.org/x/crypto v0.52.0 declares `go 1.25.0`, so 1.23 can
+# no longer build this module.
+FROM golang:1.25-alpine AS backend-builder
 ARG VERSION="V0.1.0"
 WORKDIR /app
 
