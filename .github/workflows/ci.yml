@@ -1,0 +1,80 @@
+name: CI
+
+# The Docker build only runs on pushes to master, so until this existed a pull
+# request had no checks at all. Auto-merge needs something to wait for.
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:  # Allow manual trigger
+
+# One run per branch; a new push supersedes an in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Go backend ────────────────────────────────────────────────────────────
+  backend:
+    name: go
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+
+      # web/assets.go does `//go:embed all:out`, and unlike the other Go repos
+      # here there is no committed placeholder — go:embed fails outright on a
+      # missing directory, so the package will not even compile without one.
+      # A stub is enough for the Go build: the real export is proven by the
+      # `next build` job below and by the Docker build on master.
+      - name: Stub the embedded web export
+        run: mkdir -p web/out && touch web/out/index.html
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+  # ── Next.js frontend ──────────────────────────────────────────────────────
+  frontend:
+    name: next build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # Matches the frontend-builder stage in the Dockerfile. Bump both together.
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # next.config.ts sets `output: 'export'`, so this is what produces the
+      # web/out directory the Go binary embeds.
+      - name: Build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+        run: npm run build
