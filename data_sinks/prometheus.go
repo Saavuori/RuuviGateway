@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime"
+	"sync"
 
 	"github.com/Saavuori/RuuviGateway/common/version"
 	"github.com/Saavuori/RuuviGateway/config"
@@ -264,6 +265,17 @@ func recordMetrics(m parser.Measurement) {
 	safeSetB(metrics.rtcOnBoot, m.RtcOnBoot)
 }
 
+// The metric collectors and the scrape endpoint are process-global: the default
+// prometheus registry rejects a second registration of the same collector, and
+// the port can only be bound once. The sink is rebuilt on every config change,
+// so both are set up exactly once and reused by later instances.
+var (
+	metricsOnce  sync.Once
+	endpointOnce sync.Once
+	activePrefix string
+	activePort   int
+)
+
 func Prometheus(conf config.Prometheus) chan<- parser.Measurement {
 	port := conf.Port
 	if port == 0 {
@@ -275,14 +287,38 @@ func Prometheus(conf config.Prometheus) chan<- parser.Measurement {
 	if conf.MeasurementMetricPrefix != "" {
 		measurementMetricPrefix = fmt.Sprintf("%s_", conf.MeasurementMetricPrefix)
 	}
-	initMetrics(measurementMetricPrefix)
+
+	metricsOnce.Do(func() {
+		initMetrics(measurementMetricPrefix)
+		activePrefix = measurementMetricPrefix
+	})
+	if activePrefix != measurementMetricPrefix {
+		log.WithFields(log.Fields{
+			"active_prefix":    activePrefix,
+			"requested_prefix": measurementMetricPrefix,
+		}).Warn("Prometheus metric prefix cannot be changed without a restart, keeping the current one")
+	}
+
 	go func() {
 		for measurement := range measurements {
 			recordMetrics(measurement)
 		}
 	}()
 
-	go http.ListenAndServe(fmt.Sprintf(":%d", port), promhttp.Handler())
+	endpointOnce.Do(func() {
+		activePort = port
+		go func() {
+			if err := http.ListenAndServe(fmt.Sprintf(":%d", port), promhttp.Handler()); err != nil {
+				log.WithError(err).WithField("port", port).Error("Prometheus metrics server failed")
+			}
+		}()
+	})
+	if activePort != port {
+		log.WithFields(log.Fields{
+			"active_port":    activePort,
+			"requested_port": port,
+		}).Warn("Prometheus port cannot be changed without a restart, keeping the current one")
+	}
 
 	return measurements
 }

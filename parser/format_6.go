@@ -16,7 +16,9 @@ func ParseFormat6(input string) (Measurement, error) {
 	if err != nil {
 		return m, err
 	}
-	if len(data) < 23 {
+	// 7 header bytes (flags + length + type + company identifier) are stripped
+	// below, after which the highest byte read is the flags byte at offset 16.
+	if len(data) < 24 {
 		return m, errors.New("data is too short")
 	}
 
